@@ -1,0 +1,19 @@
+# Optional scientific computing dependencies
+# These require system libraries (HDF5, etc.) and may be harder to install on Windows
+
+# For TEMPO satellite data processing (NetCDF files)
+netCDF4>=1.6.0
+xarray>=2023.0.0
+
+# Additional scientific libraries
+scipy>=1.7.0
+matplotlib>=3.5.0
+cartopy>=0.20.0
+
+# Development dependencies
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+black>=23.0.0
+isort>=5.12.0
+flake8>=6.0.0
+mypy>=1.0.0
