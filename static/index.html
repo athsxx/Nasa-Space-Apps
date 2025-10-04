@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air Quality Monitoring Agent</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 10px 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #95a5a6, #7f8c8d);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .aqi-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .aqi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .aqi-value {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .aqi-category {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .location-info {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        .pollutants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .pollutant-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+
+        .pollutant-name {
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .pollutant-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .pollutant-concentration {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .health-advisory {
+            background: #e8f4fd;
+            border: 1px solid #bee5eb;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .health-advisory h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .recommendations {
+            list-style: none;
+        }
+
+        .recommendations li {
+            background: white;
+            margin: 8px 0;
+            padding: 12px 15px;
+            border-radius: 5px;
+            border-left: 3px solid #3498db;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border: 1px solid #f5c6cb;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .tab {
+            padding: 12px 25px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            border-bottom-color: #3498db;
+            color: #3498db;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .aqi-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .pollutants-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌍 Air Quality Monitoring Agent</h1>
+            <p>Real-time air quality data with EPA standard AQI calculations</p>
+        </div>
+
+        <div class="main-content">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('location')">📍 By Location</div>
+                <div class="tab" onclick="switchTab('coordinates')">🗺️ By Coordinates</div>
+                <div class="tab" onclick="switchTab('auto')">🎯 Auto Detect</div>
+            </div>
+
+            <!-- Location Tab -->
+            <div id="location-tab" class="tab-content active">
+                <div class="input-section">
+                    <h3>Search by Location</h3>
+                    <div class="input-group">
+                        <label for="location-input">Enter City, State/Country:</label>
+                        <input type="text" id="location-input" placeholder="e.g., New York, NY or Paris, France" value="New York, NY">
+                    </div>
+                    <button class="btn" onclick="getAQIByLocation()">🔍 Get Air Quality</button>
+                    <button class="btn btn-secondary" onclick="testSampleLocations()">🧪 Test Sample Cities</button>
+                </div>
+            </div>
+
+            <!-- Coordinates Tab -->
+            <div id="coordinates-tab" class="tab-content">
+                <div class="input-section">
+                    <h3>Search by Coordinates</h3>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="latitude">Latitude:</label>
+                            <input type="number" id="latitude" placeholder="40.7128" step="any" value="40.7128">
+                        </div>
+                        <div class="input-group">
+                            <label for="longitude">Longitude:</label>
+                            <input type="number" id="longitude" placeholder="-74.0060" step="any" value="-74.0060">
+                        </div>
+                    </div>
+                    <button class="btn" onclick="getAQIByCoordinates()">🔍 Get Air Quality</button>
+                    <button class="btn btn-secondary" onclick="testSampleCoordinates()">🧪 Test Sample Coordinates</button>
+                </div>
+            </div>
+
+            <!-- Auto Detect Tab -->
+            <div id="auto-tab" class="tab-content">
+                <div class="input-section">
+                    <h3>Auto-Detect Location</h3>
+                    <p>Automatically detect your location based on IP address.</p>
+                    <button class="btn btn-success" onclick="getAQIAuto()">🎯 Auto-Detect My Location</button>
+                </div>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Fetching air quality data...</p>
+            </div>
+
+            <!-- Results Section -->
+            <div class="result-section" id="results">
+                <!-- Results will be populated here -->
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2025 NASA Air Quality Monitoring Agent | Built for Space Apps Challenge</p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function showError(message) {
+            hideLoading();
+            document.getElementById('results').innerHTML = `
+                <div class="error">
+                    <strong>Error:</strong> ${message}
+                </div>
+            `;
+            document.getElementById('results').style.display = 'block';
+        }
+
+        function getAQIColor(aqi) {
+            if (aqi <= 50) return '#00E400';
+            if (aqi <= 100) return '#FFFF00';
+            if (aqi <= 150) return '#FF7E00';
+            if (aqi <= 200) return '#FF0000';
+            if (aqi <= 300) return '#8F3F97';
+            return '#7E0023';
+        }
+
+        function displayResults(data) {
+            hideLoading();
+            const resultsDiv = document.getElementById('results');
+            
+            const aqiColor = getAQIColor(data.overall_aqi);
+            
+            let pollutantsHTML = '';
+            data.pollutant_details.forEach(pollutant => {
+                const pollutantColor = getAQIColor(pollutant.aqi_value);
+                pollutantsHTML += `
+                    <div class="pollutant-card" style="border-left-color: ${pollutantColor}">
+                        <div class="pollutant-name">${pollutant.pollutant.toUpperCase()}</div>
+                        <div class="pollutant-value" style="color: ${pollutantColor}">${pollutant.aqi_value} AQI</div>
+                        <div class="pollutant-concentration">${pollutant.concentration.toFixed(2)} ${pollutant.unit}</div>
+                        <div style="font-size: 0.85em; font-weight: 600; color: ${pollutantColor}">${pollutant.category}</div>
+                    </div>
+                `;
+            });
+
+            // Get health recommendations
+            fetch(`${API_BASE}/health/recommendations?aqi=${data.overall_aqi}`)
+                .then(response => response.json())
+                .then(healthData => {
+                    let recommendationsHTML = '';
+                    healthData.recommendations.forEach(rec => {
+                        recommendationsHTML += `<li>${rec}</li>`;
+                    });
+
+                    resultsDiv.innerHTML = `
+                        <div class="aqi-card">
+                            <div class="aqi-header">
+                                <div>
+                                    <div class="aqi-value" style="color: ${aqiColor}">${data.overall_aqi}</div>
+                                    <div class="aqi-category" style="color: ${aqiColor}">${data.overall_category}</div>
+                                </div>
+                                <div class="location-info">
+                                    <strong>📍 ${data.location.address || data.location.city || 'Unknown Location'}</strong><br>
+                                    <small>Dominant Pollutant: ${data.dominant_pollutant.toUpperCase()}</small><br>
+                                    <small>Data Sources: ${data.data_sources.join(', ')}</small>
+                                </div>
+                            </div>
+
+                            <div class="pollutants-grid">
+                                ${pollutantsHTML}
+                            </div>
+
+                            <div class="health-advisory">
+                                <h3>🏥 Health Advisory</h3>
+                                <p style="margin-bottom: 15px; font-weight: 600;">${data.health_message}</p>
+                                <h4>Recommendations:</h4>
+                                <ul class="recommendations">
+                                    ${recommendationsHTML}
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                })
+                .catch(() => {
+                    // Fallback if health recommendations fail
+                    resultsDiv.innerHTML = `
+                        <div class="aqi-card">
+                            <div class="aqi-header">
+                                <div>
+                                    <div class="aqi-value" style="color: ${aqiColor}">${data.overall_aqi}</div>
+                                    <div class="aqi-category" style="color: ${aqiColor}">${data.overall_category}</div>
+                                </div>
+                                <div class="location-info">
+                                    <strong>📍 ${data.location.address || data.location.city || 'Unknown Location'}</strong><br>
+                                    <small>Dominant Pollutant: ${data.dominant_pollutant.toUpperCase()}</small><br>
+                                    <small>Data Sources: ${data.data_sources.join(', ')}</small>
+                                </div>
+                            </div>
+
+                            <div class="pollutants-grid">
+                                ${pollutantsHTML}
+                            </div>
+
+                            <div class="health-advisory">
+                                <h3>🏥 Health Advisory</h3>
+                                <p>${data.health_message}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+
+            resultsDiv.style.display = 'block';
+        }
+
+        async function getAQIByLocation() {
+            const location = document.getElementById('location-input').value.trim();
+            if (!location) {
+                showError('Please enter a location');
+                return;
+            }
+
+            showLoading();
+            try {
+                const response = await fetch(`${API_BASE}/aqi/location/${encodeURIComponent(location)}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                const data = await response.json();
+                displayResults(data);
+            } catch (error) {
+                showError(`Failed to fetch data: ${error.message}`);
+            }
+        }
+
+        async function getAQIByCoordinates() {
+            const lat = document.getElementById('latitude').value;
+            const lon = document.getElementById('longitude').value;
+            
+            if (!lat || !lon) {
+                showError('Please enter both latitude and longitude');
+                return;
+            }
+
+            showLoading();
+            try {
+                const response = await fetch(`${API_BASE}/aqi/coordinates?lat=${lat}&lon=${lon}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                const data = await response.json();
+                displayResults(data);
+            } catch (error) {
+                showError(`Failed to fetch data: ${error.message}`);
+            }
+        }
+
+        async function getAQIAuto() {
+            showLoading();
+            try {
+                const response = await fetch(`${API_BASE}/aqi/auto`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                const data = await response.json();
+                displayResults(data);
+            } catch (error) {
+                showError(`Failed to fetch data: ${error.message}`);
+            }
+        }
+
+        async function testSampleLocations() {
+            const locations = [
+                'New York, NY',
+                'Los Angeles, CA',
+                'Tokyo, Japan',
+                'London, UK',
+                'Beijing, China'
+            ];
+            
+            const randomLocation = locations[Math.floor(Math.random() * locations.length)];
+            document.getElementById('location-input').value = randomLocation;
+            await getAQIByLocation();
+        }
+
+        async function testSampleCoordinates() {
+            const coordinates = [
+                { lat: 40.7128, lon: -74.0060, name: 'New York' },
+                { lat: 34.0522, lon: -118.2437, name: 'Los Angeles' },
+                { lat: 35.6762, lon: 139.6503, name: 'Tokyo' },
+                { lat: 51.5074, lon: -0.1278, name: 'London' },
+                { lat: 33.4484, lon: -112.0740, name: 'Phoenix' }
+            ];
+            
+            const randomCoord = coordinates[Math.floor(Math.random() * coordinates.length)];
+            document.getElementById('latitude').value = randomCoord.lat;
+            document.getElementById('longitude').value = randomCoord.lon;
+            await getAQIByCoordinates();
+        }
+
+        // Test connection on page load
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                if (response.ok) {
+                    console.log('✅ API server is running');
+                } else {
+                    throw new Error('API server not responding');
+                }
+            } catch (error) {
+                showError('API server is not running. Please start the server with: python main.py');
+            }
+        });
+
+        // Allow Enter key to trigger search
+        document.getElementById('location-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') getAQIByLocation();
+        });
+    </script>
+</body>
+</html>

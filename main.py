@@ -1,9 +1,12 @@
 """FastAPI web application for Air Quality Monitoring Agent."""
 
 from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 import uvicorn
+import os
 
 from aqi_agent import aqi_agent, AQIResponse, LocationRequest
 
@@ -16,10 +19,28 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Mount static files
+if os.path.exists("static"):
+    app.mount("/static", StaticFiles(directory="static"), name="static")
+
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
-    """Root endpoint with basic information."""
+    """Serve the frontend interface or API information."""
+    # Check if frontend exists and serve it
+    if os.path.exists("static/index.html"):
+        return FileResponse("static/index.html")
+    
+    # Fallback to API information page
     html_content = """
     <!DOCTYPE html>
     <html>
