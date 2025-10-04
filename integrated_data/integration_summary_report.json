@@ -1,0 +1,126 @@
+{
+  "timestamp": "2025-10-04T16:00:39.443653",
+  "datasets": {
+    "epa": {
+      "records": 17350700,
+      "columns": [
+        "State Code",
+        "County Code",
+        "Site Num",
+        "Parameter Code",
+        "POC",
+        "Latitude",
+        "Longitude",
+        "Datum",
+        "Parameter Name",
+        "Date Local",
+        "Time Local",
+        "Date GMT",
+        "Time GMT",
+        "Sample Measurement",
+        "Units of Measure",
+        "MDL",
+        "Uncertainty",
+        "Qualifier",
+        "Method Type",
+        "Method Code",
+        "Method Name",
+        "State Name",
+        "County Name",
+        "Date of Last Change",
+        "parameter_code",
+        "pollutant"
+      ],
+      "date_range": {
+        "start": "2024-01-01T00:00:00",
+        "end": "2024-12-31T00:00:00"
+      },
+      "spatial_extent": null
+    },
+    "satellite": {
+      "records": 1500,
+      "columns": [
+        "date",
+        "latitude",
+        "longitude",
+        "parameter",
+        "value",
+        "units",
+        "source"
+      ],
+      "date_range": {
+        "start": "2025-09-04T00:00:00",
+        "end": "2025-10-04T00:00:00"
+      },
+      "spatial_extent": {
+        "lat_min": 10.08400836100821,
+        "lat_max": 84.83053637867064,
+        "lon_min": -179.969121935135,
+        "lon_max": -50.03670247280303
+      }
+    },
+    "weather": {
+      "records": 3100,
+      "columns": [
+        "date",
+        "latitude",
+        "longitude",
+        "location_id",
+        "temperature",
+        "humidity",
+        "wind_speed",
+        "wind_direction",
+        "wind_u",
+        "wind_v",
+        "precipitation",
+        "solar_radiation",
+        "uv_index",
+        "source"
+      ],
+      "date_range": {
+        "start": "2025-09-04T00:00:00",
+        "end": "2025-10-04T00:00:00"
+      },
+      "spatial_extent": {
+        "lat_min": 10.41415878427018,
+        "lat_max": 83.92378405829506,
+        "lon_min": -177.8435822393787,
+        "lon_max": -51.70469824193276
+      }
+    }
+  },
+  "integration": {
+    "grid_points": 2574,
+    "data_coverage": {
+      "sat_no2": {
+        "grid_points_with_data": 5,
+        "coverage_percent": 0.19425019425019424
+      },
+      "sat_o3": {
+        "grid_points_with_data": 5,
+        "coverage_percent": 0.19425019425019424
+      },
+      "sat_aod": {
+        "grid_points_with_data": 3,
+        "coverage_percent": 0.11655011655011654
+      }
+    },
+    "parameter_summary": {}
+  },
+  "correlations": {
+    "strongest_positive": {
+      "variables": [
+        "sat_no2_avg",
+        "sat_o3_avg"
+      ],
+      "correlation": 0.9785960278970136
+    },
+    "strongest_negative": {
+      "variables": [
+        "sat_no2_avg",
+        "sat_no2_avg"
+      ],
+      "correlation": 0.0
+    }
+  }
+}
