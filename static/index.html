@@ -1460,7 +1460,8 @@
     </div>
 
     <script>
-        const API_BASE = 'http://127.0.0.1:8080';
+        // Dynamic API base URL - works both locally and in deployment
+        const API_BASE = window.location.origin;
 
         function switchTab(tabName) {
             // Hide all tab contents
