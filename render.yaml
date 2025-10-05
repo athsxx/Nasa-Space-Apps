@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: nasa-air-quality
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements-deploy.txt
+    startCommand: python nasa_server.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: TELEGRAM_BOT_TOKEN
+        value: 8348450996:AAGI1sl6XjqXyHv_qdXPBDbbS4SvSv7FwL4
+      - key: DEFAULT_CHAT_ID
+        value: 1538644238
+      - key: APP_ENV
+        value: production
+    healthCheckPath: /health

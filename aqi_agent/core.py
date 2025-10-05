@@ -1,20 +1,46 @@
 """Core AQI monitoring agent functionality."""
 
 from typing import List, Optional
+import logging
 
 from .models import AQIResponse, LocationRequest, Location
 from .location import location_service
 from .data_sources import data_manager
 from .aqi_calculator import AQICalculator
 
+# Try to import ML Fusion components
+try:
+    from ml_fusion import SurfaceEstimator, WeatherIntegration
+    ML_FUSION_AVAILABLE = True
+except ImportError:
+    ML_FUSION_AVAILABLE = False
+    SurfaceEstimator = None
+    WeatherIntegration = None
+
+logger = logging.getLogger(__name__)
+
 
 class AQIAgent:
-    """Main AQI monitoring agent."""
+    """Main AQI monitoring agent with ML fusion capabilities."""
     
-    def __init__(self):
+    def __init__(self, use_ml_fusion: bool = True):
         self.location_service = location_service
         self.data_manager = data_manager
         self.aqi_calculator = AQICalculator()
+        
+        # Initialize ML Fusion components if available
+        self.use_ml_fusion = use_ml_fusion and ML_FUSION_AVAILABLE
+        self.surface_estimator = None
+        self.weather_integration = None
+        
+        if self.use_ml_fusion:
+            try:
+                self.surface_estimator = SurfaceEstimator()
+                self.weather_integration = WeatherIntegration()
+                logger.info("ML Fusion components initialized successfully")
+            except Exception as e:
+                logger.warning(f"Failed to initialize ML Fusion: {e}")
+                self.use_ml_fusion = False
     
     async def get_aqi_for_location(self, location_request: LocationRequest) -> AQIResponse:
         """Get AQI data for a specified location."""
@@ -149,6 +175,110 @@ Pollutant Details:
         return {
             "message": "Trend analysis not yet implemented",
             "suggestion": "Historical data collection needed for trend analysis"
+        }
+    
+    async def get_ml_predicted_aqi(self, location_request: LocationRequest) -> dict:
+        """Get AQI prediction using ML fusion model."""
+        if not self.use_ml_fusion or not self.surface_estimator or not self.surface_estimator.is_trained:
+            return {
+                "error": "ML Fusion not available or models not trained",
+                "fallback_message": "Using traditional data sources instead"
+            }
+        
+        try:
+            # Resolve location
+            location = self._resolve_location(location_request)
+            
+            # Get TEMPO satellite features (mock for now)
+            tempo_features = await self._get_tempo_features(location)
+            
+            # Get weather features
+            weather_features = None
+            if self.weather_integration:
+                weather_features = self.weather_integration.create_weather_features_for_location(
+                    location.latitude, location.longitude
+                )
+            
+            # Make ML prediction
+            prediction_result = self.surface_estimator.predict_surface_concentrations(
+                latitude=location.latitude,
+                longitude=location.longitude,
+                tempo_features=tempo_features,
+                weather_features=weather_features
+            )
+            
+            if 'error' in prediction_result:
+                return prediction_result
+            
+            # Add traditional AQI calculation for comparison
+            try:
+                traditional_aqi = await self.get_aqi_for_location(location_request)
+                prediction_result['traditional_comparison'] = {
+                    'aqi_value': traditional_aqi.overall_aqi,
+                    'category': traditional_aqi.overall_category,
+                    'dominant_pollutant': traditional_aqi.dominant_pollutant
+                }
+            except Exception as e:
+                logger.warning(f"Failed to get traditional AQI for comparison: {e}")
+            
+            return prediction_result
+            
+        except Exception as e:
+            logger.error(f"ML prediction failed: {e}")
+            return {
+                "error": f"ML prediction failed: {str(e)}",
+                "fallback_message": "Try using traditional data sources"
+            }
+    
+    async def _get_tempo_features(self, location: Location) -> Optional[dict]:
+        """Get TEMPO satellite features for a location (mock implementation)."""
+        # This would integrate with actual TEMPO data processing
+        # For now, return mock features based on location
+        
+        # Mock TEMPO features based on location characteristics
+        mock_features = {
+            'no2_column': 5e15,  # molecules/cm²
+            'o3_column': 8e17,   # molecules/cm²
+            'co_column': 4e17,   # molecules/cm²
+            'so2_column': 1e14,  # molecules/cm²
+            'hcho_column': 3e15, # molecules/cm²
+            'aerosol_optical_depth': 0.2,
+            'cloud_fraction': 0.1
+        }
+        
+        # Add some location-based variation
+        import random
+        if location.latitude > 40:  # Northern cities - potentially higher pollution
+            mock_features['no2_column'] *= random.uniform(1.2, 2.0)
+        
+        if abs(location.longitude) > 100:  # Western US - different pollution profile
+            mock_features['co_column'] *= random.uniform(0.8, 1.5)
+        
+        return mock_features
+    
+    def get_ml_model_info(self) -> dict:
+        """Get information about ML fusion models."""
+        if not self.use_ml_fusion:
+            return {"status": "ML Fusion not available"}
+        
+        if not self.surface_estimator:
+            return {"status": "Surface estimator not initialized"}
+        
+        if not self.surface_estimator.is_trained:
+            return {
+                "status": "Models not trained",
+                "suggestion": "Run 'python train_ml_fusion.py' to train models"
+            }
+        
+        # Get model performance info
+        performance = self.surface_estimator.get_model_performance()
+        feature_importance = self.surface_estimator.get_feature_importance()
+        
+        return {
+            "status": "ML Fusion available",
+            "models_trained": True,
+            "performance": performance,
+            "top_features": feature_importance.head(5).to_dict('records') if not feature_importance.empty else []
         }
 
 

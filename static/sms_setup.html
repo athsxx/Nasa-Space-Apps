@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMS Setup Guide - NASA Air Quality Alerts</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .status-box {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid;
+        }
+        
+        .status-box.warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+        
+        .status-box.info {
+            background: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+        
+        .status-box.success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .step h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        
+        .code {
+            background: #f1f1f1;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 5px;
+        }
+        
+        .btn:hover {
+            background: #0056b3;
+        }
+        
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 NASA Air Quality SMS Setup Guide</h1>
+        
+        <div class="status-box warning">
+            <strong>⚠️ SMS Service Status:</strong> Your Twilio account is active but requires additional setup to send SMS messages.
+        </div>
+        
+        <div class="status-box info">
+            <strong>📊 Account Details:</strong>
+            <ul>
+                <li>Account SID: ACa65323829a21cf3daa9e766316e0eac9</li>
+                <li>Account Status: Active (Trial)</li>
+                <li>Account Balance: $15.50 USD</li>
+                <li>Phone Numbers: None configured</li>
+            </ul>
+        </div>
+        
+        <h2>🔧 Setup Steps Required</h2>
+        
+        <div class="step">
+            <h3><span class="emoji">📱</span>Step 1: Get a Twilio Phone Number</h3>
+            <p>You need a phone number to send SMS from. For trial accounts, you can get a free number:</p>
+            <ol>
+                <li>Go to <a href="https://console.twilio.com/" target="_blank">Twilio Console</a></li>
+                <li>Navigate to <strong>Phone Numbers → Manage → Buy a number</strong></li>
+                <li>Choose any available number (free for trial accounts)</li>
+                <li>Configure the number for SMS</li>
+            </ol>
+        </div>
+        
+        <div class="step">
+            <h3><span class="emoji">✅</span>Step 2: Verify Recipient Phone Numbers</h3>
+            <p>Trial accounts can only send SMS to verified numbers:</p>
+            <ol>
+                <li>Go to <a href="https://console.twilio.com/" target="_blank">Twilio Console</a></li>
+                <li>Navigate to <strong>Phone Numbers → Verified Caller IDs</strong></li>
+                <li>Add your phone number and complete verification</li>
+                <li>You can add multiple numbers for testing</li>
+            </ol>
+        </div>
+        
+        <div class="step">
+            <h3><span class="emoji">🔄</span>Step 3: Restart the Service</h3>
+            <p>After completing the above steps:</p>
+            <ol>
+                <li>Restart the NASA server</li>
+                <li>The system will automatically detect your new phone number</li>
+                <li>Test SMS functionality with verified numbers</li>
+            </ol>
+        </div>
+        
+        <h2>🧪 Testing Instructions</h2>
+        
+        <div class="status-box info">
+            <p><strong>Once setup is complete:</strong></p>
+            <ol>
+                <li>Go to the <strong>SMS Alerts</strong> tab in the main application</li>
+                <li>Enter a <strong>verified phone number</strong> (from Step 2)</li>
+                <li>Enter your location (e.g., "Los Angeles, CA")</li>
+                <li>Click <strong>Subscribe to SMS Alerts</strong></li>
+                <li>You should receive a welcome SMS immediately</li>
+            </ol>
+        </div>
+        
+        <h2>🆘 Troubleshooting</h2>
+        
+        <div class="step">
+            <h3>Common Issues & Solutions</h3>
+            <ul>
+                <li><strong>"Not a verified number":</strong> Add the recipient number to Verified Caller IDs</li>
+                <li><strong>"No phone number available":</strong> Get a Twilio phone number from the console</li>
+                <li><strong>"Premium rate number":</strong> Don't use test numbers, use real mobile numbers</li>
+                <li><strong>"Account not authorized":</strong> Complete phone number verification</li>
+            </ul>
+        </div>
+        
+        <div class="status-box success">
+            <strong>💡 Pro Tip:</strong> Once you upgrade from trial to paid account, you can send SMS to any valid phone number without verification.
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="/" class="btn">← Back to Air Quality Monitor</a>
+            <a href="https://console.twilio.com/" class="btn" target="_blank">Open Twilio Console →</a>
+        </div>
+    </div>
+</body>
+</html>

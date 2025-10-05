@@ -12,7 +12,7 @@ DEMO_MODE = True  # Enable demo mode with mock data
 
 # Location Detection
 IP_GEOLOCATION_API = "http://ip-api.com/json"
-DEFAULT_LOCATION = {"lat": 40.7128, "lon": -74.0060}  # New York City
+DEFAULT_LOCATION = {"lat": 40.7128, "lon": -74.0060}  # New York City (fallback only)
 
 # Pollutant Configuration
 POLLUTANTS = ["pm25", "pm10", "co", "o3", "no2", "so2"]

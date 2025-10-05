@@ -1,0 +1,19 @@
+2025-10-04 17:45:09,477 - __main__ - INFO - Starting ML Fusion Training Pipeline
+2025-10-04 17:45:09,478 - __main__ - INFO - Step 1: Loading/generating training data
+2025-10-04 17:45:09,478 - __main__ - INFO - Generating synthetic training data...
+2025-10-04 17:45:09,597 - __main__ - INFO - Generated 500 TEMPO and 500 OpenAQ samples
+2025-10-04 17:45:09,597 - __main__ - INFO - Step 2: Preprocessing data
+2025-10-04 17:45:09,597 - ml_fusion.data_preprocessor - INFO - Preprocessing TEMPO satellite data...
+2025-10-04 17:45:09,601 - ml_fusion.data_preprocessor - INFO - Removed 0 rows with missing critical data
+2025-10-04 17:45:09,621 - ml_fusion.data_preprocessor - INFO - Filtered 306 TEMPO records for quality
+2025-10-04 17:45:09,626 - ml_fusion.data_preprocessor - INFO - TEMPO data preprocessed: 194 records
+2025-10-04 17:45:09,627 - ml_fusion.data_preprocessor - INFO - Preprocessing OpenAQ ground station data...
+2025-10-04 17:45:09,632 - ml_fusion.data_preprocessor - INFO - Removed 0 rows with missing critical data
+2025-10-04 17:45:09,647 - ml_fusion.data_preprocessor - INFO - Removed 113 outliers from ground data
+2025-10-04 17:45:09,651 - ml_fusion.data_preprocessor - INFO - OpenAQ data preprocessed: 387 records
+2025-10-04 17:45:09,652 - __main__ - INFO - Step 3: Finding collocated data pairs
+2025-10-04 17:45:09,652 - ml_fusion.spatial_temporal_fusion - INFO - Creating hourly averages...
+2025-10-04 17:45:09,683 - ml_fusion.spatial_temporal_fusion - INFO - Created hourly averages: TEMPO 194, OpenAQ 387
+2025-10-04 17:45:09,683 - ml_fusion.spatial_temporal_fusion - INFO - Finding collocated satellite-ground data pairs...
+2025-10-04 17:45:10,017 - ml_fusion.spatial_temporal_fusion - INFO - Found 0 collocated pairs
+2025-10-04 17:45:10,018 - __main__ - WARNING - Only 0 matches found. Consider relaxing matching criteria.

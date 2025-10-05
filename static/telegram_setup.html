@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Bot AQI Alerts Setup Guide</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #3498db;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+        .step {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #0088cc;
+            border-radius: 5px;
+        }
+        .step h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        code {
+            background: #e8f4f8;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .highlight {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .button {
+            display: inline-block;
+            background: #0088cc;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #006699;
+        }
+        .chat-id-finder {
+            background: #e8f6f3;
+            border: 1px solid #1abc9c;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Telegram AQI Alert Bot Setup</h1>
+        
+        <div style="background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <h3>⚠️ Important Note About Chat IDs</h3>
+            <p><strong>The Chat ID 8348450996 is the Bot's own ID, not a user Chat ID!</strong></p>
+            <p>Bots cannot send messages to themselves. You must use your personal Chat ID to receive messages.</p>
+        </div>
+        
+        <div class="highlight">
+            <strong>🎯 Goal:</strong> Get air quality alerts directly in your Telegram chat!
+            Fast, reliable, and completely free notifications.
+        </div>
+
+        <div class="step">
+            <h3>Step 1: Start the Bot</h3>
+            <ol>
+                <li>Click this link to open the bot: <a href="https://t.me/YourAQIBot" target="_blank">@YourAQIBot</a></li>
+                <li>Click "Start" or send <code>/start</code></li>
+                <li>The bot will respond with a welcome message</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>Step 2: Find Your Chat ID</h3>
+            <div class="chat-id-finder">
+                <h4>🔍 Easy Chat ID Finder:</h4>
+                <ol>
+                    <li>Forward any message to: <a href="https://t.me/userinfobot" target="_blank">@userinfobot</a></li>
+                    <li>It will reply with your Chat ID (looks like: <code>123456789</code>)</li>
+                    <li>Copy this number - you'll need it to subscribe</li>
+                </ol>
+                <p><strong>Alternative:</strong> Send <code>/chatid</code> to our bot and it will show your Chat ID</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>Step 3: Subscribe to Alerts</h3>
+            <p>Use this API endpoint to subscribe:</p>
+            <code>GET /telegram/subscribe?chat_id=YOUR_CHAT_ID&location=New York&threshold=100</code>
+            
+            <h4>Parameters:</h4>
+            <ul>
+                <li><strong>chat_id:</strong> Your Telegram Chat ID (from Step 2)</li>
+                <li><strong>location:</strong> City or location to monitor</li>
+                <li><strong>threshold:</strong> AQI level to trigger alerts (default: 100)</li>
+            </ul>
+
+            <h4>Example:</h4>
+            <code>http://localhost:8080/telegram/subscribe?chat_id=123456789&location=Los Angeles&threshold=85</code>
+        </div>
+
+        <div class="step">
+            <h3>Step 4: Test Your Setup</h3>
+            <p>Send a test alert to verify everything works:</p>
+            <code>GET /telegram/test?chat_id=YOUR_CHAT_ID</code>
+            
+            <p>Example:</p>
+            <code>http://localhost:8080/telegram/test?chat_id=123456789</code>
+            
+            <p>You should receive a test AQI alert in your Telegram chat!</p>
+        </div>
+
+        <h2>🔧 Available Commands</h2>
+        <div class="step">
+            <h3>API Endpoints:</h3>
+            <ul>
+                <li><strong>Subscribe:</strong> <code>/telegram/subscribe?chat_id=123&location=City&threshold=100</code></li>
+                <li><strong>Unsubscribe:</strong> <code>/telegram/unsubscribe?chat_id=123</code></li>
+                <li><strong>Test Alert:</strong> <code>/telegram/test?chat_id=123</code></li>
+                <li><strong>Bot Status:</strong> <code>/telegram/status</code></li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>Bot Commands (in Telegram chat):</h3>
+            <ul>
+                <li><code>/start</code> - Start interaction with bot</li>
+                <li><code>/help</code> - Show help message</li>
+                <li><code>/chatid</code> - Get your Chat ID</li>
+                <li><code>/unsubscribe</code> - Unsubscribe from alerts</li>
+            </ul>
+        </div>
+
+        <h2>🌟 Features</h2>
+        <div class="step">
+            <ul>
+                <li>✅ <strong>Instant Notifications:</strong> Get alerts within seconds</li>
+                <li>✅ <strong>Rich Formatting:</strong> Color-coded AQI levels with emojis</li>
+                <li>✅ <strong>Health Advice:</strong> Detailed health recommendations</li>
+                <li>✅ <strong>Free Service:</strong> No costs, no limits</li>
+                <li>✅ <strong>Location-Based:</strong> Alerts for your specific area</li>
+                <li>✅ <strong>Customizable:</strong> Set your own AQI threshold</li>
+            </ul>
+        </div>
+
+        <div class="success">
+            <strong>✅ All Set!</strong> You'll now receive beautiful AQI alerts directly in Telegram.
+            The bot will notify you when air quality exceeds your threshold with detailed information
+            and health recommendations.
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="/" class="button">🏠 Back to Dashboard</a>
+            <a href="/telegram/status" class="button">📊 Check Bot Status</a>
+            <a href="https://t.me/userinfobot" target="_blank" class="button">🔍 Get Chat ID</a>
+        </div>
+    </div>
+</body>
+</html>
