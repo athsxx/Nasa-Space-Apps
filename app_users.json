@@ -1,0 +1,40 @@
+{
+  "e971c4fc-41b2-4c25-acdd-12fd3f936915": {
+    "user_token": "e971c4fc-41b2-4c25-acdd-12fd3f936915",
+    "fingerprint": "cb342594552eceab",
+    "created_at": "2025-10-05T23:15:31.899182",
+    "last_seen": "2025-10-05T23:15:31.899198",
+    "telegram_chat_id": null,
+    "telegram_connected": false,
+    "telegram_connected_at": null,
+    "preferences": {
+      "location": null,
+      "alert_threshold": 101,
+      "notifications_enabled": true
+    },
+    "usage_stats": {
+      "total_queries": 0,
+      "last_query": null,
+      "favorite_locations": []
+    }
+  },
+  "fe947ed3-6f27-4a4d-9254-3e532f342e5b": {
+    "user_token": "fe947ed3-6f27-4a4d-9254-3e532f342e5b",
+    "fingerprint": "a3ce38a857cae393",
+    "created_at": "2025-10-05T23:16:06.341707",
+    "last_seen": "2025-10-05T23:16:06.341723",
+    "telegram_chat_id": null,
+    "telegram_connected": false,
+    "telegram_connected_at": null,
+    "preferences": {
+      "location": null,
+      "alert_threshold": 101,
+      "notifications_enabled": true
+    },
+    "usage_stats": {
+      "total_queries": 0,
+      "last_query": null,
+      "favorite_locations": []
+    }
+  }
+}

@@ -15,6 +15,13 @@ from datetime import datetime
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Import user manager for user-bot connections
+try:
+    from user_manager import UserManager
+except ImportError:
+    UserManager = None
+    logger.warning("UserManager not available - user connections disabled")
+
 class TelegramAlertService:
     """Telegram Alert service for air quality notifications"""
     
@@ -28,6 +35,9 @@ class TelegramAlertService:
         self.bot_token = bot_token
         self.base_url = f"https://api.telegram.org/bot{bot_token}"
         self.subscribers = self._load_subscribers()
+        
+        # Initialize user manager for user connections
+        self.user_manager = UserManager() if UserManager else None
         
     def _load_subscribers(self) -> Dict[str, Dict]:
         """Load subscribers from JSON file"""
@@ -349,6 +359,202 @@ To subscribe again, visit: <code>/telegram/subscribe</code>
                 'timestamp': datetime.now().isoformat()
             }
     
+    def handle_user_connection(self, chat_id: str, user_token: str) -> Dict[str, Any]:
+        """
+        Handle user connection from /start command with token
+        
+        Args:
+            chat_id: Telegram chat ID
+            user_token: User token from app
+            
+        Returns:
+            Dict with connection status
+        """
+        try:
+            if not self.user_manager:
+                return {
+                    'success': False,
+                    'message': 'User management not available'
+                }
+            
+            # Connect user's Telegram account
+            result = self.user_manager.connect_telegram(user_token, chat_id)
+            
+            if result['success']:
+                # Send welcome message
+                welcome_msg = f"""
+<b>🎉 Welcome to NASA Air Quality Alerts!</b>
+
+Your Telegram account has been successfully connected to your app profile.
+
+<b>What's next?</b>
+• Return to the app to set your location preferences
+• You'll receive personalized air quality alerts
+• Use /help to see available commands
+
+<b>Available Commands:</b>
+/help - Show available commands
+/status - Check your alert settings
+/unsubscribe - Stop receiving alerts
+
+Thank you for joining our air quality monitoring community! 🌍
+                """
+                
+                if self.send_message(chat_id, welcome_msg):
+                    logger.info(f"User connection successful: {user_token[:8]}... → {chat_id}")
+                    return {
+                        'success': True,
+                        'message': 'Successfully connected to Telegram!',
+                        'chat_id': chat_id,
+                        'user_token': user_token
+                    }
+                else:
+                    return {
+                        'success': False,
+                        'message': 'Connection successful but welcome message failed'
+                    }
+            else:
+                return result
+                
+        except Exception as e:
+            logger.error(f"Error handling user connection: {e}")
+            return {
+                'success': False,
+                'message': f'Connection failed: {str(e)}'
+            }
+    
+    def handle_bot_command(self, chat_id: str, command: str, args: str = "") -> Dict[str, Any]:
+        """
+        Handle bot commands from Telegram
+        
+        Args:
+            chat_id: Telegram chat ID
+            command: Bot command (without /)
+            args: Command arguments
+            
+        Returns:
+            Dict with command response
+        """
+        try:
+            if command == "start":
+                if args:  # User token provided
+                    return self.handle_user_connection(chat_id, args)
+                else:
+                    # Regular start command
+                    start_msg = """
+<b>🌍 NASA Air Quality Monitor Bot</b>
+
+Welcome! This bot provides personalized air quality alerts.
+
+<b>To get started:</b>
+1. Open the NASA Air Quality app
+2. Click "Get updates on Telegram"
+3. You'll be redirected back here automatically
+
+<b>Commands:</b>
+/help - Show this help message
+/status - Check your connection status
+                    """
+                    self.send_message(chat_id, start_msg)
+                    return {'success': True, 'message': 'Start message sent'}
+                    
+            elif command == "help":
+                help_msg = """
+<b>🤖 NASA Air Quality Bot Commands</b>
+
+<b>Main Commands:</b>
+/start - Begin setup or connect account
+/help - Show this help message
+/status - Check your alert settings
+/unsubscribe - Stop receiving alerts
+
+<b>How it works:</b>
+1. Connect your account through the web app
+2. Set your location and alert preferences
+3. Receive personalized air quality notifications
+
+Visit the app to manage your preferences and view detailed air quality data.
+                """
+                self.send_message(chat_id, help_msg)
+                return {'success': True, 'message': 'Help message sent'}
+                
+            elif command == "status":
+                # Check if user is connected
+                if self.user_manager:
+                    user = self.user_manager.get_user_by_telegram(chat_id)
+                    if user:
+                        status_msg = f"""
+<b>📊 Your Connection Status</b>
+
+<b>Status:</b> ✅ Connected
+<b>Connected:</b> {user.get('telegram_connected_at', 'Unknown')[:10]}
+<b>Total Queries:</b> {user.get('usage_stats', {}).get('total_queries', 0)}
+<b>Notifications:</b> {'✅ Enabled' if user.get('preferences', {}).get('notifications_enabled') else '❌ Disabled'}
+
+Use the web app to update your preferences and location settings.
+                        """
+                    else:
+                        status_msg = """
+<b>📊 Connection Status</b>
+
+<b>Status:</b> ❌ Not Connected
+
+To connect your account:
+1. Open the NASA Air Quality web app
+2. Click "Get updates on Telegram"
+3. Follow the connection process
+                        """
+                else:
+                    status_msg = "User management system not available."
+                    
+                self.send_message(chat_id, status_msg)
+                return {'success': True, 'message': 'Status message sent'}
+                
+            elif command == "unsubscribe":
+                # Disconnect user
+                if self.user_manager:
+                    user = self.user_manager.get_user_by_telegram(chat_id)
+                    if user:
+                        result = self.user_manager.disconnect_telegram(user['user_token'])
+                        if result['success']:
+                            unsub_msg = """
+<b>👋 Unsubscribed Successfully</b>
+
+You've been disconnected from air quality alerts.
+
+To reconnect:
+1. Visit the NASA Air Quality web app
+2. Click "Get updates on Telegram"
+3. Complete the connection process
+
+Thank you for using our service!
+                            """
+                        else:
+                            unsub_msg = "❌ Failed to unsubscribe. Please try again."
+                    else:
+                        unsub_msg = "❌ No active subscription found."
+                else:
+                    unsub_msg = "User management system not available."
+                    
+                self.send_message(chat_id, unsub_msg)
+                return {'success': True, 'message': 'Unsubscribe processed'}
+                
+            else:
+                unknown_msg = f"""
+❓ Unknown command: /{command}
+
+Type /help to see available commands.
+                """
+                self.send_message(chat_id, unknown_msg)
+                return {'success': True, 'message': 'Unknown command handled'}
+                
+        except Exception as e:
+            logger.error(f"Error handling bot command: {e}")
+            return {
+                'success': False,
+                'message': f'Command failed: {str(e)}'
+            }
+
     def get_bot_info(self) -> Dict[str, Any]:
         """Get bot information for setup verification"""
         try:

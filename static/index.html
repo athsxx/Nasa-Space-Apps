@@ -1178,6 +1178,156 @@
                 font-size: 0.875rem;
             }
         }
+        
+        /* User Onboarding Styles */
+        .telegram-onboarding {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .telegram-onboarding::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+            pointer-events: none;
+        }
+        
+        .telegram-onboarding-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .telegram-onboarding-text {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .telegram-onboarding-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .telegram-onboarding-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+        
+        .telegram-onboarding-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn-telegram {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .btn-telegram:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-1px);
+        }
+        
+        .btn-telegram-primary {
+            background: rgba(255, 255, 255, 0.9);
+            color: #667eea;
+            border-color: transparent;
+        }
+        
+        .btn-telegram-primary:hover {
+            background: white;
+            color: #5a6fd8;
+        }
+        
+        .btn-dismiss {
+            background: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .btn-dismiss:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .telegram-connection-status {
+            background: var(--success);
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+        
+        .connection-success-text {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .user-stats {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+        
+        /* Hide onboarding by default */
+        .telegram-onboarding.hidden {
+            display: none;
+        }
+        
+        .telegram-connection-status.hidden {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .telegram-onboarding-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .telegram-onboarding-actions {
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1193,6 +1343,41 @@
                 </div>
             </div>
         </header>
+
+        <!-- Telegram Onboarding Banner (shown to new users) -->
+        <div id="telegram-onboarding" class="telegram-onboarding hidden">
+            <div class="telegram-onboarding-content">
+                <div class="telegram-onboarding-text">
+                    <div class="telegram-onboarding-title">
+                        📩 Get Air Quality Updates on Telegram
+                    </div>
+                    <div class="telegram-onboarding-subtitle">
+                        Connect your Telegram account to receive personalized air quality alerts and updates directly in your messenger.
+                    </div>
+                </div>
+                <div class="telegram-onboarding-actions">
+                    <button class="btn-telegram btn-telegram-primary" onclick="connectTelegram()">
+                        <span>📱</span>
+                        Connect Telegram
+                    </button>
+                    <button class="btn-telegram" onclick="dismissOnboarding()">
+                        Maybe Later
+                    </button>
+                    <button class="btn-dismiss" onclick="dismissOnboarding(true)">✕</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Telegram Connection Status (shown to connected users) -->
+        <div id="telegram-status" class="telegram-connection-status hidden">
+            <div class="connection-success-text">
+                <span>✅</span>
+                <span>Telegram connected! You'll receive air quality alerts.</span>
+            </div>
+            <div class="user-stats">
+                <span id="user-stats-text">Connected user</span>
+            </div>
+        </div>
 
         <main class="main-content">
             <nav class="tabs" role="tablist">
@@ -2090,12 +2275,209 @@
             await getAQIByCoordinates();
         }
 
-        // Test connection on page load
+        // User Management and Telegram Integration
+        let userToken = localStorage.getItem('nasa_user_token');
+        let telegramConnected = localStorage.getItem('telegram_connected') === 'true';
+
+        async function initializeUser() {
+            try {
+                // Check if user needs registration
+                if (!userToken) {
+                    const response = await fetch(`${API_BASE}/user/register`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success) {
+                            userToken = data.user_token;
+                            localStorage.setItem('nasa_user_token', userToken);
+                            localStorage.setItem('telegram_connection_url', data.telegram_connection_url);
+                            
+                            // Show onboarding for new users
+                            showTelegramOnboarding();
+                            console.log('✅ New user registered:', userToken.substring(0, 8) + '...');
+                        }
+                    }
+                } else {
+                    // Check if existing user has Telegram connected
+                    if (telegramConnected) {
+                        showTelegramConnected();
+                    } else {
+                        // Show onboarding to existing users without Telegram
+                        setTimeout(showTelegramOnboarding, 5000); // Show after 5 seconds
+                    }
+                }
+            } catch (error) {
+                console.error('User initialization failed:', error);
+            }
+        }
+
+        function showTelegramOnboarding() {
+            const onboarding = document.getElementById('telegram-onboarding');
+            if (onboarding) {
+                onboarding.classList.remove('hidden');
+                
+                // Auto-hide after 30 seconds if no interaction
+                setTimeout(() => {
+                    if (!onboarding.classList.contains('hidden')) {
+                        dismissOnboarding();
+                    }
+                }, 30000);
+            }
+        }
+
+        function showTelegramConnected() {
+            const status = document.getElementById('telegram-status');
+            if (status) {
+                status.classList.remove('hidden');
+                
+                // Update stats if available
+                const statsText = document.getElementById('user-stats-text');
+                if (statsText) {
+                    const totalQueries = localStorage.getItem('total_queries') || '0';
+                    statsText.textContent = `Connected • ${totalQueries} queries made`;
+                }
+            }
+        }
+
+        async function connectTelegram() {
+            try {
+                if (!userToken) {
+                    showError('User registration required. Please refresh the page.');
+                    return;
+                }
+
+                const telegramUrl = localStorage.getItem('telegram_connection_url') || 
+                                  `http://t.me/Augustabot?start=${userToken}`;
+                
+                // Open Telegram bot in new window
+                window.open(telegramUrl, '_blank');
+                
+                // Hide onboarding and show connecting status
+                dismissOnboarding();
+                
+                // Show connecting message
+                showInfo('Opening Telegram... Click "Start" in the bot to complete connection!');
+                
+                // Start checking for connection status
+                checkTelegramConnection();
+                
+            } catch (error) {
+                console.error('Error connecting Telegram:', error);
+                showError('Failed to open Telegram connection. Please try again.');
+            }
+        }
+
+        async function checkTelegramConnection(attempts = 0) {
+            try {
+                if (attempts > 12) { // Stop after 2 minutes (10s * 12)
+                    return;
+                }
+
+                // In a real implementation, you would poll the server to check connection status
+                // For now, we'll use a simplified approach
+                
+                setTimeout(() => {
+                    checkTelegramConnection(attempts + 1);
+                }, 10000); // Check every 10 seconds
+                
+            } catch (error) {
+                console.error('Error checking Telegram connection:', error);
+            }
+        }
+
+        // This function would be called by Telegram webhook or polling
+        function onTelegramConnected(chatId) {
+            localStorage.setItem('telegram_connected', 'true');
+            localStorage.setItem('telegram_chat_id', chatId);
+            telegramConnected = true;
+            
+            // Hide onboarding and show success
+            dismissOnboarding();
+            showTelegramConnected();
+            
+            showSuccess('🎉 Telegram connected successfully! You\'ll now receive air quality alerts.');
+        }
+
+        function dismissOnboarding(permanent = false) {
+            const onboarding = document.getElementById('telegram-onboarding');
+            if (onboarding) {
+                onboarding.classList.add('hidden');
+                
+                if (permanent) {
+                    localStorage.setItem('telegram_onboarding_dismissed', 'true');
+                }
+            }
+        }
+
+        function showInfo(message) {
+            const existingInfo = document.querySelector('.info-message');
+            if (existingInfo) {
+                existingInfo.remove();
+            }
+            
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'info-message';
+            infoDiv.style.cssText = `
+                background: var(--primary);
+                color: white;
+                padding: 1rem;
+                border-radius: var(--border-radius);
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            `;
+            infoDiv.innerHTML = `<span>ℹ️</span><span>${message}</span>`;
+            
+            const main = document.querySelector('.main-content');
+            main.insertBefore(infoDiv, main.firstChild);
+            
+            // Auto-remove after 10 seconds
+            setTimeout(() => {
+                if (infoDiv.parentNode) {
+                    infoDiv.remove();
+                }
+            }, 10000);
+        }
+
+        function showSuccess(message) {
+            const existingSuccess = document.querySelector('.success-message');
+            if (existingSuccess) {
+                existingSuccess.remove();
+            }
+            
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.style.cssText = `
+                background: var(--success);
+                color: white;
+                padding: 1rem;
+                border-radius: var(--border-radius);
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            `;
+            successDiv.innerHTML = `<span>✅</span><span>${message}</span>`;
+            
+            const main = document.querySelector('.main-content');
+            main.insertBefore(successDiv, main.firstChild);
+            
+            // Auto-remove after 8 seconds
+            setTimeout(() => {
+                if (successDiv.parentNode) {
+                    successDiv.remove();
+                }
+            }, 8000);
+        }
+
+        // Test connection and initialize user on page load
         window.addEventListener('load', async () => {
             try {
                 const response = await fetch(`${API_BASE}/health`);
                 if (response.ok) {
-                    console.log('API server is running');
+                    console.log('✅ API server is running');
+                    // Initialize user after confirming server is running
+                    await initializeUser();
                 } else {
                     throw new Error('API server not responding');
                 }

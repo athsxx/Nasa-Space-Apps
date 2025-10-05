@@ -16,8 +16,9 @@ import mimetypes
 # Add project directories to Python path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-# Import Telegram service
+# Import Telegram service and User management
 from telegram_service import TelegramAlertService
+from user_manager import UserManager
 
 # Global NASA components (initialized once)
 COMPONENTS = {}
@@ -34,6 +35,14 @@ def initialize_nasa_components():
     except Exception as e:
         print(f"WARNING: AQI Agent not available: {e}")
         COMPONENTS['aqi_agent'] = None
+    
+    try:
+        # Initialize User Manager
+        COMPONENTS['user_manager'] = UserManager()
+        print("SUCCESS: User Manager loaded")
+    except Exception as e:
+        print(f"WARNING: User Manager not available: {e}")
+        COMPONENTS['user_manager'] = None
     
     try:
         # Initialize Telegram Service
@@ -217,6 +226,19 @@ class NASASpaceAppsHandler(BaseHTTPRequestHandler):
                 self.handle_telegram_status()
             elif clean_path == '/telegram/setup':
                 self.handle_telegram_setup_guide()
+                
+            # User Management endpoints
+            elif clean_path == '/user/register':
+                self.handle_user_registration()
+            elif clean_path == '/user/telegram-connect':
+                user_token = query_params.get('token', [''])[0]
+                chat_id = query_params.get('chat_id', [''])[0]
+                self.handle_telegram_connection(user_token, chat_id)
+            elif clean_path == '/user/stats':
+                self.handle_user_stats()
+            elif clean_path.startswith('/telegram/webhook'):
+                # Handle Telegram webhook for bot commands
+                self.handle_telegram_webhook()
             
             # Static files
             elif clean_path == '/' or clean_path == '/index.html':
@@ -261,6 +283,12 @@ class NASASpaceAppsHandler(BaseHTTPRequestHandler):
                 try:
                     data = json.loads(post_data.decode('utf-8'))
                     self.handle_aqi_gps(data)
+                except json.JSONDecodeError:
+                    self.send_json_response({"error": "Invalid JSON"}, 400)
+            elif clean_path.startswith('/telegram/webhook'):
+                try:
+                    data = json.loads(post_data.decode('utf-8'))
+                    self.handle_telegram_webhook_post(data)
                 except json.JSONDecodeError:
                     self.send_json_response({"error": "Invalid JSON"}, 400)
             else:
@@ -1552,6 +1580,138 @@ This confirms that the NASA AQI Alert bot can send messages to your chat success
     def handle_telegram_setup_guide(self):
         """Serve Telegram setup guide"""
         self.serve_static_file('static/telegram_setup.html')
+    
+    # User Management Handlers
+    def handle_user_registration(self):
+        """Handle new user registration"""
+        try:
+            if not self.components['user_manager']:
+                self.send_json_response({'error': 'User management not available'}, 503)
+                return
+            
+            # Get client info for analytics
+            client_ip = self.get_client_ip()
+            user_agent = self.headers.get('User-Agent', '')
+            
+            # Create new user
+            result = self.components['user_manager'].create_user(client_ip, user_agent)
+            
+            if result['success']:
+                response = {
+                    'success': True,
+                    'user_token': result['user_token'],
+                    'telegram_connection_url': result['telegram_connection_url'],
+                    'message': 'User registered successfully'
+                }
+                print(f"✅ New user registered: {result['user_token'][:8]}...")
+            else:
+                response = {
+                    'success': False,
+                    'message': result['message']
+                }
+                
+            self.send_json_response(response)
+            
+        except Exception as e:
+            print(f"❌ Error in user registration: {e}")
+            self.send_json_response({'error': f'Registration failed: {str(e)}'}, 500)
+    
+    def handle_telegram_connection(self, user_token, chat_id):
+        """Handle Telegram account connection"""
+        try:
+            if not self.components['user_manager']:
+                self.send_json_response({'error': 'User management not available'}, 503)
+                return
+                
+            if not user_token or not chat_id:
+                self.send_json_response({'error': 'Missing user_token or chat_id'}, 400)
+                return
+            
+            # Connect Telegram account
+            result = self.components['user_manager'].connect_telegram(user_token, chat_id)
+            
+            if result['success']:
+                response = {
+                    'success': True,
+                    'message': result['message'],
+                    'connected': True
+                }
+                print(f"✅ Telegram connected: {user_token[:8]}... → {chat_id}")
+            else:
+                response = {
+                    'success': False,
+                    'message': result['message'],
+                    'connected': False
+                }
+                
+            self.send_json_response(response)
+            
+        except Exception as e:
+            print(f"❌ Error in Telegram connection: {e}")
+            self.send_json_response({'error': f'Connection failed: {str(e)}'}, 500)
+    
+    def handle_user_stats(self):
+        """Handle user statistics request"""
+        try:
+            if not self.components['user_manager']:
+                self.send_json_response({'error': 'User management not available'}, 503)
+                return
+            
+            stats = self.components['user_manager'].get_stats()
+            self.send_json_response({
+                'success': True,
+                'stats': stats
+            })
+            
+        except Exception as e:
+            print(f"❌ Error getting user stats: {e}")
+            self.send_json_response({'error': f'Stats failed: {str(e)}'}, 500)
+    
+    def handle_telegram_webhook(self):
+        """Handle Telegram webhook for bot commands (GET - just return info)"""
+        try:
+            response = {
+                'service': 'telegram_webhook',
+                'status': 'active',
+                'endpoint': '/telegram/webhook',
+                'methods': ['POST'],
+                'description': 'Telegram bot webhook endpoint for receiving updates'
+            }
+            self.send_json_response(response)
+            
+        except Exception as e:
+            print(f"❌ Error in webhook info: {e}")
+            self.send_json_response({'error': f'Webhook info failed: {str(e)}'}, 500)
+    
+    def handle_telegram_webhook_post(self, webhook_data):
+        """Handle Telegram webhook POST data"""
+        try:
+            if not self.components['telegram_service']:
+                self.send_json_response({'error': 'Telegram service not available'}, 503)
+                return
+            
+            # Import bot handler
+            try:
+                from telegram_bot_handler import TelegramBotHandler
+                bot_handler = TelegramBotHandler()
+                
+                # Process the webhook update
+                result = bot_handler.handle_webhook(webhook_data)
+                
+                if result['success']:
+                    print(f"✅ Telegram webhook processed: {result['message']}")
+                    self.send_json_response({'ok': True, 'result': result})
+                else:
+                    print(f"⚠️ Telegram webhook processing failed: {result['message']}")
+                    self.send_json_response({'ok': False, 'error': result['message']}, 400)
+                    
+            except ImportError as e:
+                print(f"❌ Bot handler not available: {e}")
+                self.send_json_response({'error': 'Bot handler not available'}, 503)
+                
+        except Exception as e:
+            print(f"❌ Error in webhook POST: {e}")
+            self.send_json_response({'error': f'Webhook processing failed: {str(e)}'}, 500)
 
 
 def main():
