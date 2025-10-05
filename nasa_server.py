@@ -257,6 +257,12 @@ class NASASpaceAppsHandler(BaseHTTPRequestHandler):
                     self.handle_advanced_prediction_post(model_type, data)
                 except json.JSONDecodeError:
                     self.send_json_response({"error": "Invalid JSON"}, 400)
+            elif clean_path == '/aqi_gps':
+                try:
+                    data = json.loads(post_data.decode('utf-8'))
+                    self.handle_aqi_gps(data)
+                except json.JSONDecodeError:
+                    self.send_json_response({"error": "Invalid JSON"}, 400)
             else:
                 self.send_json_response({"error": "POST endpoint not found"}, 404)
                 
@@ -598,6 +604,177 @@ class NASASpaceAppsHandler(BaseHTTPRequestHandler):
             response = self._get_simulated_coordinates_response(lat, lon)
         
         self.send_json_response(response)
+
+    def handle_aqi_gps(self, data):
+        """Handle GPS-based AQI request with reverse geocoding to show city name"""
+        try:
+            lat = data.get('lat')
+            lon = data.get('lon')
+            
+            if not lat or not lon:
+                self.send_json_response({"error": "Missing latitude or longitude"}, 400)
+                return
+            
+            print(f"🛰️ GPS AQI request for coordinates: {lat}, {lon}")
+            
+            # Get city name using reverse geocoding
+            city_name = self.reverse_geocode(lat, lon)
+            print(f"🏙️ Reverse geocoded location: {city_name}")
+            
+            # Use AQI agent if available
+            if self.components['aqi_agent']:
+                try:
+                    # Import required models
+                    from aqi_agent.models import LocationRequest
+                    
+                    # Create location request from coordinates
+                    location_request = LocationRequest(latitude=float(lat), longitude=float(lon))
+                    
+                    # Get real AQI data
+                    import asyncio
+                    import concurrent.futures
+                    try:
+                        # Always use ThreadPoolExecutor to avoid event loop conflicts
+                        with concurrent.futures.ThreadPoolExecutor() as executor:
+                            future = executor.submit(asyncio.run, self.components['aqi_agent'].get_aqi_for_location(location_request))
+                            aqi_response = future.result(timeout=15)
+                        
+                        # Convert AQI response to our format with enhanced location info
+                        response = {
+                            "request_type": "gps",
+                            "data_source": "openaq_real",
+                            "location": {
+                                "latitude": float(lat),
+                                "longitude": float(lon),
+                                "address": aqi_response.location.address,
+                                "city": city_name,
+                                "coordinates": f"{lat:.4f}, {lon:.4f}"
+                            },
+                            "overall_aqi": aqi_response.overall_aqi,
+                            "overall_category": aqi_response.overall_category,
+                            "dominant_pollutant": aqi_response.dominant_pollutant,
+                            "pollutant_details": [
+                                {
+                                    "name": detail.pollutant.upper(),
+                                    "pollutant": detail.pollutant.upper(),
+                                    "concentration": detail.concentration,
+                                    "value": detail.concentration,
+                                    "unit": detail.unit,
+                                    "aqi": detail.aqi_value,
+                                    "aqi_value": detail.aqi_value,
+                                    "category": detail.category
+                                } for detail in aqi_response.pollutant_details
+                            ],
+                            "health_message": aqi_response.health_message,
+                            "recommendations": self.components['aqi_agent'].get_health_recommendations(aqi_response.overall_aqi),
+                            "timestamp": aqi_response.timestamp.isoformat(),
+                            "data_sources": aqi_response.data_sources
+                        }
+                        
+                    except Exception as e:
+                        print(f"⚠️  AQI Agent error: {e}, falling back to simulated data")
+                        response = self._get_simulated_gps_response(lat, lon, city_name)
+                        
+                except Exception as e:
+                    print(f"⚠️  AQI Agent import error: {e}, using simulated data")
+                    response = self._get_simulated_gps_response(lat, lon, city_name)
+            else:
+                response = self._get_simulated_gps_response(lat, lon, city_name)
+            
+            self.send_json_response(response)
+            
+        except Exception as e:
+            print(f"❌ Error in GPS AQI request: {e}")
+            self.send_json_response({"error": f"GPS processing failed: {str(e)}"}, 500)
+
+    def reverse_geocode(self, lat, lon):
+        """Reverse geocode coordinates to get city name using multiple services"""
+        try:
+            import urllib.request
+            import urllib.error
+            import json
+            
+            # Try OpenStreetMap Nominatim first (free, no API key needed)
+            try:
+                nominatim_url = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lon}&zoom=10&addressdetails=1"
+                headers = {'User-Agent': 'NASA-AQI-Monitor/1.0'}
+                
+                req = urllib.request.Request(nominatim_url, headers=headers)
+                with urllib.request.urlopen(req, timeout=10) as response:
+                    data = json.loads(response.read().decode())
+                    
+                if 'address' in data:
+                    address = data['address']
+                    # Try to get city name in order of preference
+                    city = (address.get('city') or 
+                           address.get('town') or 
+                           address.get('village') or 
+                           address.get('county') or 
+                           address.get('state'))
+                    
+                    if city:
+                        country = address.get('country', '')
+                        return f"{city}, {country}" if country else city
+                        
+            except Exception as e:
+                print(f"⚠️ Nominatim reverse geocoding failed: {e}")
+            
+            # Fallback to ip-api.com reverse geocoding
+            try:
+                ipapi_url = f"http://ip-api.com/json/?lat={lat}&lon={lon}&fields=city,regionName,country"
+                with urllib.request.urlopen(ipapi_url, timeout=10) as response:
+                    data = json.loads(response.read().decode())
+                    
+                if data.get('status') == 'success':
+                    city = data.get('city', '')
+                    region = data.get('regionName', '')
+                    country = data.get('country', '')
+                    
+                    if city:
+                        if region and region != city:
+                            return f"{city}, {region}, {country}"
+                        else:
+                            return f"{city}, {country}"
+                            
+            except Exception as e:
+                print(f"⚠️ IP-API reverse geocoding failed: {e}")
+            
+            # Final fallback - generic location
+            return f"Location ({lat:.4f}, {lon:.4f})"
+            
+        except Exception as e:
+            print(f"❌ Reverse geocoding error: {e}")
+            return f"Location ({lat:.4f}, {lon:.4f})"
+
+    def _get_simulated_gps_response(self, lat, lon, city_name):
+        """Generate simulated GPS response with city name"""
+        return {
+            "request_type": "gps",
+            "data_source": "simulated",
+            "location": {
+                "latitude": float(lat),
+                "longitude": float(lon),
+                "address": city_name,
+                "city": city_name,
+                "coordinates": f"{lat:.4f}, {lon:.4f}"
+            },
+            "overall_aqi": 78,
+            "overall_category": "Moderate",
+            "dominant_pollutant": "pm25",
+            "pollutant_details": [
+                {"name": "PM2.5", "pollutant": "PM2.5", "concentration": 22.8, "value": 22.8, "unit": "μg/m³", "aqi": 78, "aqi_value": 78, "category": "Moderate"},
+                {"name": "PM10", "pollutant": "PM10", "concentration": 41.2, "value": 41.2, "unit": "μg/m³", "aqi": 38, "aqi_value": 38, "category": "Good"},
+                {"name": "NO2", "pollutant": "NO2", "concentration": 15.3, "value": 15.3, "unit": "ppb", "aqi": 18, "aqi_value": 18, "category": "Good"},
+                {"name": "O3", "pollutant": "O3", "concentration": 58.9, "value": 58.9, "unit": "ppb", "aqi": 52, "aqi_value": 52, "category": "Moderate"}
+            ],
+            "health_message": f"Air quality in {city_name} is moderate. GPS location detected successfully.",
+            "recommendations": [
+                "GPS detection successful - showing local air quality data",
+                "People with respiratory conditions should limit outdoor activities",
+                "Consider wearing a mask if you're sensitive to air pollution"
+            ],
+            "timestamp": datetime.datetime.now().isoformat()
+        }
 
     def _get_simulated_coordinates_response(self, lat, lon):
         """Generate simulated coordinates response"""

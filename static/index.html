@@ -1749,10 +1749,33 @@
                 console.error('❌ Auto-detection error:', error);
                 hideLoading();
                 
-                // Provide helpful error message and fallback option
-                const errorMessage = `
-                    <div class="error">
-                        <h3>🌐 Location Detection Failed</h3>
+                // Enhanced error handling with specific messages and multiple fallback options
+                let errorDetails = '';
+                let suggestedActions = '';
+                
+                if (error.message.includes('502')) {
+                    errorDetails = `
+                        <p><strong>Error:</strong> HTTP 502 - Bad Gateway</p>
+                        <p>This indicates a server communication issue that can occur during:</p>
+                        <ul style="text-align: left; margin: 10px 0;">
+                            <li>Server restarts or updates</li>
+                            <li>Network proxy issues</li>
+                            <li>Temporary server overload</li>
+                        </ul>
+                    `;
+                    suggestedActions = `
+                        <button class="btn btn-primary" onclick="getAQIByGPS()">
+                            📱 Try GPS Location
+                        </button>
+                        <button class="btn btn-secondary" onclick="getAQIAuto()" style="margin-left: 10px;">
+                            🔄 Retry Auto-Detect
+                        </button>
+                        <button class="btn btn-outline" onclick="switchToLocationTab()" style="margin-left: 10px;">
+                            📍 Manual Location
+                        </button>
+                    `;
+                } else {
+                    errorDetails = `
                         <p><strong>Error:</strong> ${error.message}</p>
                         <p>This can happen due to:</p>
                         <ul style="text-align: left; margin: 10px 0;">
@@ -1760,14 +1783,30 @@
                             <li>Location services being blocked</li>
                             <li>Server configuration differences</li>
                         </ul>
-                        <p><strong>💡 Solution:</strong> Please use the "By Location" tab to manually enter your city.</p>
-                        <div style="margin-top: 15px;">
-                            <button class="btn btn-primary" onclick="switchToLocationTab()">
-                                📍 Enter Location Manually
-                            </button>
-                            <button class="btn btn-secondary" onclick="getAQIAuto()" style="margin-left: 10px;">
-                                🔄 Try Auto-Detect Again
-                            </button>
+                    `;
+                    suggestedActions = `
+                        <button class="btn btn-primary" onclick="switchToLocationTab()">
+                            📍 Enter Location Manually
+                        </button>
+                        <button class="btn btn-secondary" onclick="getAQIByGPS()" style="margin-left: 10px;">
+                            � Try GPS Location
+                        </button>
+                        <button class="btn btn-outline" onclick="getAQIAuto()" style="margin-left: 10px;">
+                            🔄 Try Again
+                        </button>
+                    `;
+                }
+                
+                const errorMessage = `
+                    <div class="error">
+                        <h3>🌐 Location Detection Failed</h3>
+                        ${errorDetails}
+                        <p><strong>💡 Solutions:</strong> Try one of these alternatives:</p>
+                        <div style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 10px;">
+                            ${suggestedActions}
+                        </div>
+                        <div style="margin-top: 15px; padding: 10px; background: rgba(0, 212, 255, 0.1); border-radius: 6px; font-size: 14px;">
+                            💡 <strong>Tip:</strong> GPS location works best and shows your exact city name!
                         </div>
                     </div>
                 `;
@@ -1881,8 +1920,18 @@
                     <small style="color: var(--text-secondary);">Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)}</small>
                 `;
                 
-                // Use the coordinates endpoint
-                const response = await fetch(`${API_BASE}/aqi/coordinates?lat=${lat}&lon=${lon}`);
+                // Use the GPS endpoint with POST request for enhanced city name detection
+                const response = await fetch(`${API_BASE}/aqi_gps`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        lat: lat,
+                        lon: lon
+                    })
+                });
+                
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
@@ -1981,11 +2030,24 @@
             hideLoading();
             const resultsDiv = document.getElementById('results');
             
-            // Add GPS detection banner
+            // Get city name from the data
+            const cityName = data.location?.city || data.location?.address || `Location (${lat.toFixed(4)}, ${lon.toFixed(4)})`;
+            const coordinates = data.location?.coordinates || `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+            
+            // Add enhanced GPS detection banner with city name
             const gpsBanner = `
                 <div class="success" style="margin-bottom: 20px;">
-                    <strong>✅ GPS Location Detected Successfully!</strong><br>
-                    <small>Coordinates: ${lat.toFixed(4)}, ${lon.toFixed(4)} (±${Math.round(accuracy)}m accuracy)</small>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                        <span style="font-size: 24px;">📍</span>
+                        <div>
+                            <strong>✅ GPS Location Detected Successfully!</strong><br>
+                            <span style="font-size: 16px; color: var(--primary); font-weight: 600;">${cityName}</span>
+                        </div>
+                    </div>
+                    <div style="font-size: 13px; color: var(--text-secondary); margin-top: 5px;">
+                        <span style="margin-right: 15px;">📐 Coordinates: ${coordinates}</span>
+                        <span>🎯 Accuracy: ±${Math.round(accuracy)}m</span>
+                    </div>
                 </div>
             `;
             
