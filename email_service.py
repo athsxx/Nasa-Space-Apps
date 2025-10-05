@@ -278,7 +278,7 @@ class EmailAlertService:
                     <ul>
                         <li>Real-time air quality monitoring</li>
                         <li>Health recommendations based on current conditions</li>
-                        <li>NASA-powered ML predictions</li>
+                        <li>Integration-powered ML predictions</li>
                         <li>Personalized alerts for your location</li>
                     </ul>
                 </div>

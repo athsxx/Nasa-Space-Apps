@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-NASA Space Apps Integrated Server
-Clean, production-ready server with real NASA components integration
+Integration Platform Server
+Clean, production-ready server with real integration components
 """
 
 import os
@@ -23,24 +23,24 @@ from telegram_service import TelegramAlertService
 COMPONENTS = {}
 
 def initialize_nasa_components():
-    """Initialize NASA Space Apps components safely (called once)"""
+    """Initialize Integration components safely (called once)"""
     global COMPONENTS
     
     try:
         # Try to import AQI Agent
         from aqi_agent.core import AQIAgent
         COMPONENTS['aqi_agent'] = AQIAgent()
-        print("✅ AQI Agent loaded")
+        print("SUCCESS: AQI Agent loaded")
     except Exception as e:
-        print(f"⚠️  AQI Agent not available: {e}")
+        print(f"WARNING: AQI Agent not available: {e}")
         COMPONENTS['aqi_agent'] = None
     
     try:
         # Initialize Telegram Service
         COMPONENTS['telegram_service'] = TelegramAlertService()
-        print("✅ Telegram Alert Service loaded")
+        print("SUCCESS: Telegram Alert Service loaded")
     except Exception as e:
-        print(f"⚠️  Telegram Alert Service not available: {e}")
+        print(f"WARNING: Telegram Alert Service not available: {e}")
         COMPONENTS['telegram_service'] = None
     
     try:
@@ -76,7 +76,7 @@ def initialize_nasa_components():
 
 
 class NASASpaceAppsHandler(BaseHTTPRequestHandler):
-    """HTTP Request Handler for NASA Space Apps"""
+    """HTTP Request Handler for Integration Platform"""
     
     @property
     def components(self):
@@ -277,7 +277,7 @@ class NASASpaceAppsHandler(BaseHTTPRequestHandler):
         """Health check endpoint"""
         response = {
             "status": "healthy",
-            "service": "NASA Space Apps Server",
+            "service": "Integration Platform Server",
             "timestamp": datetime.datetime.now().isoformat(),
             "components": {
                 "aqi_agent": self.components['aqi_agent'] is not None,
@@ -313,7 +313,7 @@ class NASASpaceAppsHandler(BaseHTTPRequestHandler):
                     "parameters": ["Temperature", "Humidity", "Wind Speed", "Pressure"]
                 }
             ],
-            "integration_status": f"NASA Space Apps Enhanced System {'Active' if any(self.components.values()) else 'Simulated'}"
+            "integration_status": f"Integration Enhanced System {'Active' if any(self.components.values()) else 'Simulated'}"
         }
         self.send_json_response(response)
     
@@ -350,7 +350,7 @@ class NASASpaceAppsHandler(BaseHTTPRequestHandler):
                     "status": "loaded" if (available_models and self.components['ml_fusion']) else "simulated"
                 }
             },
-            "recommendation": "Ensemble model provides best accuracy for NASA Space Apps"
+            "recommendation": "Ensemble model provides best accuracy for Integration Platform"
         }
         self.send_json_response(response)
     
@@ -826,11 +826,11 @@ class NASASpaceAppsHandler(BaseHTTPRequestHandler):
     
     def handle_aqi_auto(self):
         """Auto-detect AQI using IP geolocation"""
-        print("🚨 HANDLE_AQI_AUTO CALLED - DEBUG")  # Debug to see if function is called
+        print("DEBUG: HANDLE_AQI_AUTO CALLED")  # Debug to see if function is called
         try:
             # Get user's actual location using IP geolocation
             auto_location = self.get_user_location_by_ip()
-            print(f"🔍 Auto-detected location: {auto_location}")  # Debug logging
+            print(f"DEBUG: Auto-detected location: {auto_location}")  # Debug logging
             
             # Try to use AQI agent with the detected location first
             if hasattr(self, 'aqi_agent') and self.aqi_agent and auto_location != "Bengaluru, Karnataka, India":
@@ -994,7 +994,7 @@ class NASASpaceAppsHandler(BaseHTTPRequestHandler):
         models_loaded = len(self.components['models']) if self.components['models'] else 0
         
         response = {
-            "model_name": "NASA Space Apps Air Quality Predictor",
+            "model_name": "Integration Air Quality Predictor",
             "model_type": "Random Forest Ensemble",
             "models_loaded": models_loaded,
             "available_models": list(self.components['models'].keys()) if self.components['models'] else [],
@@ -1259,21 +1259,21 @@ This confirms that the NASA AQI Alert bot can send messages to your chat success
 
 
 def main():
-    """Start the NASA Space Apps server"""
+    """Start the Integration Platform server"""
     try:
         # Get port from environment variable (for Render deployment) or default to 8080
         port = int(os.environ.get('PORT', 8080))
         host = '0.0.0.0'  # Listen on all interfaces for cloud deployment
         
-        print("🚀 NASA Space Apps Integrated Server")
+        print("Integration Platform Server")
         print("=" * 60)
-        print(f"🌐 Server: http://{host}:{port}")
-        print(f"🏠 Frontend: http://{host}:{port}")
-        print(f"🔧 Health: http://{host}:{port}/health")
+        print(f"Server: http://{host}:{port}")
+        print(f"Frontend: http://{host}:{port}")
+        print(f"Health: http://{host}:{port}/health")
         print("=" * 60)
         
-        # Initialize NASA components first
-        print("🔧 Initializing NASA components...")
+        # Initialize components first
+        print("Initializing components...")
         initialize_nasa_components()
         
         server_address = (host, port)

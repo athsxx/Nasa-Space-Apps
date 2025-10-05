@@ -5,80 +5,142 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram Bot AQI Alerts Setup Guide</title>
     <style>
+        :root {
+            --primary: #00d4ff;
+            --secondary: #20c997;
+            --accent: #ffc107;
+            --success: #198754;
+            --warning: #fd7e14;
+            --danger: #dc3545;
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --surface: #242424;
+            --text-primary: #f8f9fa;
+            --text-secondary: #adb5bd;
+            --text-muted: #6c757d;
+            --border-color: #404040;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            background: #f5f5f5;
-            color: #333;
+            background: var(--bg-color);
+            color: var(--text-primary);
         }
         .container {
-            background: white;
+            background: var(--card-bg);
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
         }
         h1 {
-            color: #2c3e50;
+            color: var(--text-primary);
             text-align: center;
             margin-bottom: 30px;
         }
         h2 {
-            color: #3498db;
-            border-bottom: 2px solid #ecf0f1;
+            color: var(--primary);
+            border-bottom: 2px solid var(--border-color);
             padding-bottom: 10px;
         }
         .step {
-            background: #f8f9fa;
+            background: var(--surface);
             padding: 20px;
             margin: 20px 0;
-            border-left: 4px solid #0088cc;
+            border-left: 4px solid var(--primary);
             border-radius: 5px;
+            border: 1px solid var(--border-color);
         }
         .step h3 {
             margin-top: 0;
-            color: #2c3e50;
+            color: var(--text-primary);
         }
         code {
-            background: #e8f4f8;
+            background: var(--surface);
+            color: var(--primary);
             padding: 2px 6px;
             border-radius: 3px;
             font-family: 'Courier New', monospace;
         }
         .highlight {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid var(--accent);
+            color: var(--text-primary);
             padding: 15px;
             border-radius: 5px;
             margin: 15px 0;
         }
         .success {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
+            background: rgba(25, 135, 84, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
             padding: 15px;
             border-radius: 5px;
             margin: 15px 0;
         }
         .button {
             display: inline-block;
-            background: #0088cc;
-            color: white;
+            background: var(--primary);
+            color: var(--bg-color);
             padding: 10px 20px;
             text-decoration: none;
             border-radius: 5px;
             margin: 5px;
+            transition: all 0.2s ease;
         }
         .button:hover {
-            background: #006699;
+            background: var(--secondary);
+            transform: translateY(-1px);
         }
         .chat-id-finder {
-            background: #e8f6f3;
-            border: 1px solid #1abc9c;
+            background: var(--surface);
+            border: 1px solid var(--secondary);
             padding: 20px;
             border-radius: 10px;
             margin: 20px 0;
+        }
+        
+        /* Additional dark theme elements */
+        p, li, ul {
+            color: var(--text-primary);
+        }
+        
+        strong {
+            color: var(--text-primary);
+        }
+        
+        a {
+            color: var(--primary);
+        }
+        
+        a:hover {
+            color: var(--secondary);
+        }
+        
+        .step ul li {
+            margin: 8px 0;
+        }
+        
+        .chat-id-finder h4 {
+            color: var(--secondary);
+        }
+        
+        .warning-box {
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .button-center {
+            text-align: center;
+            margin-top: 30px;
         }
     </style>
 </head>
@@ -86,7 +148,7 @@
     <div class="container">
         <h1>🤖 Telegram AQI Alert Bot Setup</h1>
         
-        <div style="background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <div class="warning-box">
             <h3>⚠️ Important Note About Chat IDs</h3>
             <p><strong>The Chat ID 8348450996 is the Bot's own ID, not a user Chat ID!</strong></p>
             <p>Bots cannot send messages to themselves. You must use your personal Chat ID to receive messages.</p>
@@ -100,7 +162,7 @@
         <div class="step">
             <h3>Step 1: Start the Bot</h3>
             <ol>
-                <li>Click this link to open the bot: <a href="https://t.me/YourAQIBot" target="_blank">@YourAQIBot</a></li>
+                <li>Click this link to open the bot: <a href="https://t.me/YourAQIBot" target="_blank" rel="noopener">@YourAQIBot</a></li>
                 <li>Click "Start" or send <code>/start</code></li>
                 <li>The bot will respond with a welcome message</li>
             </ol>
@@ -111,7 +173,7 @@
             <div class="chat-id-finder">
                 <h4>🔍 Easy Chat ID Finder:</h4>
                 <ol>
-                    <li>Forward any message to: <a href="https://t.me/userinfobot" target="_blank">@userinfobot</a></li>
+                    <li>Forward any message to: <a href="https://t.me/userinfobot" target="_blank" rel="noopener">@userinfobot</a></li>
                     <li>It will reply with your Chat ID (looks like: <code>123456789</code>)</li>
                     <li>Copy this number - you'll need it to subscribe</li>
                 </ol>
@@ -185,10 +247,10 @@
             and health recommendations.
         </div>
 
-        <div style="text-align: center; margin-top: 30px;">
+        <div class="button-center">
             <a href="/" class="button">🏠 Back to Dashboard</a>
             <a href="/telegram/status" class="button">📊 Check Bot Status</a>
-            <a href="https://t.me/userinfobot" target="_blank" class="button">🔍 Get Chat ID</a>
+            <a href="https://t.me/userinfobot" target="_blank" rel="noopener" class="button">🔍 Get Chat ID</a>
         </div>
     </div>
 </body>

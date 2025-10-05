@@ -7,38 +7,38 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Modern color system */
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --accent: #1abc9c;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
+            /* Modern dark color system */
+            --primary: #00d4ff;
+            --secondary: #20c997;
+            --accent: #ffc107;
+            --success: #198754;
+            --warning: #fd7e14;
+            --danger: #dc3545;
             
             /* Background colors */
-            --bg-color: #ffffff;
-            --card-bg: #ffffff;
-            --surface: #f8fafc;
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --surface: #242424;
             
             /* Text colors */
-            --text-primary: #2d3748;
-            --text-secondary: #64748b;
-            --text-muted: #94a3b8;
+            --text-primary: #f8f9fa;
+            --text-secondary: #adb5bd;
+            --text-muted: #6c757d;
             
             /* Border and shadow */
-            --border-color: #e2e8f0;
+            --border-color: #404040;
             --border-radius: 12px;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
             
             /* Transitions */
             --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             
             /* Legacy compatibility */
-            --primary-dark: #0052cc;
-            --light: #f8fafc;
-            --dark: #1e293b;
-            --border: #e2e8f0;
+            --primary-dark: #0099cc;
+            --light: #2d2d2d;
+            --dark: #f8f9fa;
+            --border: #404040;
         }
 
         * {
@@ -50,8 +50,8 @@
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             line-height: 1.6;
-            color: var(--dark);
-            background: #f1f5f9;
+            color: var(--text-primary);
+            background: var(--bg-color);
             font-size: 14px;
         }
 
@@ -62,8 +62,8 @@
         }
 
         .header {
-            background: white;
-            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+            border-bottom: 1px solid var(--border-color);
             padding: 1rem 0;
             position: sticky;
             top: 0;
@@ -101,7 +101,7 @@
         .logo-text {
             font-weight: 600;
             font-size: 1.25rem;
-            color: var(--dark);
+            color: var(--text-primary);
         }
 
         .status-indicator {
@@ -109,7 +109,7 @@
             align-items: center;
             gap: 0.5rem;
             font-size: 0.875rem;
-            color: var(--secondary);
+            color: var(--text-secondary);
         }
 
         .status-dot {
@@ -134,29 +134,29 @@
         }
 
         .card {
-            background: white;
+            background: var(--card-bg);
             border-radius: 12px;
             box-shadow: var(--shadow);
-            border: 1px solid var(--border);
+            border: 1px solid var(--border-color);
             overflow: hidden;
         }
 
         .card-header {
             padding: 1.5rem;
-            border-bottom: 1px solid var(--border);
-            background: #fafbfc;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--surface);
         }
 
         .card-title {
             font-size: 1.125rem;
             font-weight: 600;
-            color: var(--dark);
+            color: var(--text-primary);
             margin-bottom: 0.25rem;
         }
 
         .card-subtitle {
             font-size: 0.875rem;
-            color: var(--secondary);
+            color: var(--text-secondary);
         }
 
         .card-body {
@@ -166,8 +166,8 @@
         /* Tab System */
         .tabs {
             display: flex;
-            border-bottom: 1px solid var(--border);
-            background: white;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--card-bg);
             overflow-x: auto;
             margin-bottom: 2rem;
         }
@@ -178,7 +178,7 @@
             background: none;
             cursor: pointer;
             font-weight: 500;
-            color: var(--secondary);
+            color: var(--text-secondary);
             border-bottom: 2px solid transparent;
             transition: all 0.2s ease;
             white-space: nowrap;
@@ -189,13 +189,13 @@
 
         .tab:hover {
             color: var(--primary);
-            background: rgba(0, 102, 255, 0.05);
+            background: rgba(0, 212, 255, 0.1);
         }
 
         .tab.active {
             color: var(--primary);
             border-bottom-color: var(--primary);
-            background: rgba(0, 102, 255, 0.05);
+            background: rgba(0, 212, 255, 0.1);
         }
 
         .tab-content {
@@ -215,7 +215,7 @@
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 500;
-            color: var(--dark);
+            color: var(--text-primary);
             font-size: 0.875rem;
         }
 
@@ -223,18 +223,19 @@
         .form-select {
             width: 100%;
             padding: 0.75rem;
-            border: 1px solid var(--border);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             font-size: 0.875rem;
             transition: all 0.2s ease;
-            background: white;
+            background: var(--surface);
+            color: var(--text-primary);
         }
 
         .form-input:focus,
         .form-select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
         }
 
         .form-row {
@@ -271,14 +272,15 @@
         }
 
         .btn-secondary {
-            background: var(--light);
-            color: var(--secondary);
-            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
         }
 
         .btn-secondary:hover {
-            background: #e2e8f0;
-            border-color: var(--secondary);
+            background: var(--card-bg);
+            border-color: var(--primary);
+            color: var(--primary);
         }
 
         .btn-success {
@@ -335,11 +337,11 @@
         }
 
         .aqi-card {
-            background: white;
+            background: var(--card-bg);
             border-radius: 12px;
             padding: 1.5rem;
             box-shadow: var(--shadow);
-            border: 1px solid var(--border);
+            border: 1px solid var(--border-color);
             margin-bottom: 1rem;
         }
 
@@ -359,19 +361,19 @@
         }
 
         .location-info {
-            color: #2c3e50;
+            color: var(--text-primary);
             font-size: 1.1em;
             font-weight: 500;
             line-height: 1.5;
         }
 
         .location-info strong {
-            color: #2c3e50;
+            color: var(--text-primary);
             font-weight: 700;
         }
 
         .location-info small {
-            color: #64748b;
+            color: var(--text-secondary);
             font-weight: 500;
         }
 
@@ -383,17 +385,17 @@
         }
 
         .pollutant-card {
-            background: #ffffff;
+            background: var(--card-bg);
             padding: 20px;
             border-radius: 12px;
-            border-left: 4px solid #3498db;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e9ecef;
+            border-left: 4px solid var(--primary);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
             transition: var(--transition);
         }
 
         .pollutant-card:hover {
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            box-shadow: var(--shadow-lg);
             transform: translateY(-2px);
         }
 
@@ -401,7 +403,7 @@
             font-weight: 700;
             font-size: 1.1em;
             margin-bottom: 8px;
-            color: #2c3e50;
+            color: var(--text-primary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -410,27 +412,27 @@
             font-size: 1.8em;
             font-weight: 800;
             margin: 8px 0;
-            color: #2c3e50;
+            color: var(--text-primary);
         }
 
         .pollutant-concentration {
-            color: #64748b;
+            color: var(--text-secondary);
             font-size: 0.95em;
             font-weight: 500;
             margin-bottom: 4px;
         }
 
         .health-advisory {
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
+            background: var(--surface);
+            border: 2px solid var(--border-color);
             border-radius: 12px;
             padding: 24px;
             margin-top: 24px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            box-shadow: var(--shadow);
         }
 
         .health-advisory h3 {
-            color: #2c3e50;
+            color: var(--text-primary);
             margin-bottom: 16px;
             font-weight: 700;
             font-size: 1.3em;
@@ -440,14 +442,14 @@
         }
 
         .health-advisory p {
-            color: #2c3e50;
+            color: var(--text-primary);
             font-weight: 600;
             font-size: 1.05em;
             line-height: 1.6;
         }
 
         .health-advisory h4 {
-            color: #2c3e50;
+            color: var(--text-primary);
             font-weight: 700;
             margin: 16px 0 12px 0;
         }
@@ -457,11 +459,12 @@
         }
 
         .recommendations li {
-            background: white;
+            background: var(--card-bg);
             margin: 8px 0;
             padding: 12px 15px;
             border-radius: 5px;
-            border-left: 3px solid #3498db;
+            border-left: 3px solid var(--primary);
+            color: var(--text-primary);
         }
 
         .error {
@@ -479,7 +482,7 @@
         .tabs {
             display: flex;
             margin-bottom: 20px;
-            border-bottom: 2px solid #ecf0f1;
+            border-bottom: 2px solid var(--border-color);
         }
 
         .tab {
@@ -488,11 +491,12 @@
             border-bottom: 2px solid transparent;
             font-weight: 600;
             transition: all 0.3s ease;
+            color: var(--text-secondary);
         }
 
         .tab.active {
-            border-bottom-color: #3498db;
-            color: #3498db;
+            border-bottom-color: var(--primary);
+            color: var(--primary);
         }
 
         .tab-content {
@@ -504,16 +508,16 @@
         }
 
         .ml-info-card {
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
+            background: var(--surface);
+            border: 2px solid var(--border-color);
             border-radius: 12px;
             padding: 24px;
             margin: 20px 0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            box-shadow: var(--shadow);
         }
 
         .ml-info-card h4 {
-            color: #2c3e50;
+            color: var(--text-primary);
             margin-bottom: 16px;
             font-weight: 700;
             font-size: 1.2em;
@@ -522,7 +526,7 @@
         .ml-info-card p,
         .ml-info-card span,
         .ml-info-card div {
-            color: #2c3e50;
+            color: var(--text-primary);
             font-weight: 600;
             line-height: 1.6;
         }
@@ -558,11 +562,12 @@
         }
 
         .feature-item {
-            background: white;
+            background: var(--card-bg);
             padding: 10px;
             border-radius: 5px;
-            border-left: 3px solid #3498db;
+            border-left: 3px solid var(--primary);
             font-size: 0.9em;
+            color: var(--text-primary);
         }
 
         .ml-divider {
@@ -579,29 +584,29 @@
         }
 
         .feature-card {
-            background: #ffffff;
+            background: var(--card-bg);
             padding: 24px;
             border-radius: 12px;
-            border-left: 4px solid #e74c3c;
+            border-left: 4px solid var(--accent);
             text-align: center;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            box-shadow: var(--shadow);
         }
 
         .feature-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            box-shadow: var(--shadow-lg);
         }
 
         .feature-card h4 {
-            color: #2c3e50;
+            color: var(--text-primary);
             margin-bottom: 12px;
             font-size: 1.3em;
             font-weight: 700;
         }
 
         .feature-card p {
-            color: #2c3e50;
+            color: var(--text-secondary);
             margin-bottom: 16px;
             font-size: 1em;
             font-weight: 600;
@@ -667,11 +672,12 @@
         }
 
         .enhanced-data-display {
-            background: #e8f6f3;
-            border: 1px solid #1abc9c;
+            background: var(--surface);
+            border: 1px solid var(--secondary);
             border-radius: 8px;
             padding: 15px;
             margin: 15px 0;
+            color: var(--text-primary);
         }
 
         .data-source-badge {
@@ -698,12 +704,12 @@
 
         /* Telegram Alerts Styles */
         .telegram-form {
-            background: #f0f8ff;
+            background: var(--surface);
             padding: 20px;
             border-radius: 8px;
             margin: 15px 0;
-            border: 1px solid #b3d9ff;
-            border-left: 4px solid #007bff;
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary);
         }
 
         .telegram-form.spaced {
@@ -716,18 +722,30 @@
 
         .telegram-form h4 {
             margin-top: 0;
-            color: #007bff;
+            color: var(--primary);
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
         .telegram-info {
-            background: #e7f3ff;
+            background: var(--surface);
             padding: 20px;
             border-radius: 8px;
             margin: 15px 0;
-            border-left: 4px solid #007bff;
+            border-left: 4px solid var(--primary);
+            color: var(--text-primary);
+        }
+
+        .chat-id-help {
+            color: var(--text-muted);
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .chat-id-link {
+            color: var(--primary);
         }
 
         .telegram-info ul {
@@ -768,15 +786,15 @@
         }
 
         .success {
-            background: #f0fff4;
-            color: #22543d;
+            background: rgba(25, 135, 84, 0.1);
+            color: var(--success);
             padding: 16px 20px;
             border-radius: 8px;
-            border: 2px solid #9ae6b4;
+            border: 2px solid var(--success);
             margin: 16px 0;
             font-weight: 600;
             font-size: 1.05em;
-            box-shadow: 0 2px 4px rgba(34, 84, 61, 0.1);
+            box-shadow: var(--shadow);
         }
 
         .error {
@@ -792,11 +810,12 @@
         }
 
         .footer {
-            background: #2c3e50;
-            color: white;
+            background: var(--surface);
+            color: var(--text-secondary);
             text-align: center;
             padding: 20px;
             margin-top: 40px;
+            border-top: 1px solid var(--border-color);
         }
 
         @media (max-width: 768px) {
@@ -817,7 +836,7 @@
         /* Header enhancements */
         .header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
+            color: var(--text-primary);
             border-radius: var(--border-radius);
             margin-bottom: 2rem;
             overflow: hidden;
@@ -846,14 +865,14 @@
         }
 
         .header-main h1 {
-            color: white;
+            color: var(--text-primary);
             margin: 0 0 0.5rem 0;
             font-size: 2.5rem;
             font-weight: 700;
         }
 
         .header-subtitle {
-            color: rgba(255, 255, 255, 0.9);
+            color: var(--text-secondary);
             font-size: 1.1rem;
             margin: 0;
             max-width: 600px;
@@ -991,13 +1010,13 @@
             border-radius: calc(var(--border-radius) - 0.25rem);
             font-size: 1rem;
             transition: all var(--transition);
-            background: var(--bg-color);
+            background: var(--surface);
             color: var(--text-primary);
         }
 
         .input-field:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
             outline: none;
         }
 
@@ -1052,17 +1071,17 @@
             align-items: center;
             gap: 0.75rem;
             padding: 1.25rem;
-            background: rgba(52, 152, 219, 0.08);
+            background: var(--surface);
             border-radius: calc(var(--border-radius) - 0.25rem);
-            border-left: 4px solid var(--secondary);
-            border: 1px solid rgba(52, 152, 219, 0.15);
+            border-left: 4px solid var(--primary);
+            border: 1px solid var(--border-color);
             transition: var(--transition);
         }
 
         .info-item:hover {
-            background: rgba(52, 152, 219, 0.12);
+            background: var(--card-bg);
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.15);
+            box-shadow: var(--shadow-lg);
         }
 
         .info-icon {
@@ -1131,11 +1150,11 @@
         <header class="header">
             <div class="header-content">
                 <div class="header-main">
-                    <h1>🌍 Air Quality Monitoring Agent</h1>
+                    <h1> Air Quality Monitoring Agent</h1>
                     <p class="header-subtitle">Real-time air quality data with EPA standard AQI calculations + ML-powered predictions using TEMPO satellite data</p>
                 </div>
                 <div class="header-badge">
-                    <span class="badge">NASA Space Apps</span>
+                    <span class="badge">Nasa Space App</span>
                 </div>
             </div>
         </header>
@@ -1143,27 +1162,27 @@
         <main class="main-content">
             <nav class="tabs" role="tablist">
                 <button class="tab active" onclick="switchTab('location')" role="tab" aria-selected="true">
-                    <span class="tab-icon">📍</span>
+                    <span class="tab-icon"></span>
                     <span class="tab-label">By Location</span>
                 </button>
                 <button class="tab" onclick="switchTab('coordinates')" role="tab">
-                    <span class="tab-icon">🗺️</span>
+                    <span class="tab-icon"></span>
                     <span class="tab-label">By Coordinates</span>
                 </button>
                 <button class="tab" onclick="switchTab('auto')" role="tab">
-                    <span class="tab-icon">🎯</span>
+                    <span class="tab-icon"></span>
                     <span class="tab-label">Auto Detect</span>
                 </button>
                 <button class="tab" onclick="switchTab('ml')" role="tab">
-                    <span class="tab-icon">🧠</span>
+                    <span class="tab-icon"></span>
                     <span class="tab-label">ML Predictions</span>
                 </button>
                 <button class="tab" onclick="switchTab('nasa')" role="tab">
-                    <span class="tab-icon">🚀</span>
-                    <span class="tab-label">NASA Space Apps</span>
+                    <span class="tab-icon"></span>
+                    <span class="tab-label">Model Integerations</span>
                 </button>
                 <button class="tab" onclick="switchTab('telegram')" role="tab">
-                    <span class="tab-icon">📱</span>
+                    <span class="tab-icon"></span>
                     <span class="tab-label">Telegram Alerts</span>
                 </button>
             </nav>
@@ -1172,7 +1191,7 @@
             <div id="location-tab" class="tab-content active">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">📍 Search by Location</h3>
+                        <h3 class="card-title"> Search by Location</h3>
                         <p class="card-subtitle">Enter any city, state, or country to get real-time air quality data</p>
                     </div>
                     <div class="card-body">
@@ -1183,11 +1202,11 @@
                         </div>
                         <div class="button-group">
                             <button class="btn btn-primary" onclick="getAQIByLocation()">
-                                <span class="btn-icon">🔍</span>
+                                <span class="btn-icon"></span>
                                 Get Air Quality
                             </button>
                             <button class="btn btn-outline" onclick="testSampleLocations()">
-                                <span class="btn-icon">🧪</span>
+                                <span class="btn-icon"></span>
                                 Test Sample Cities
                             </button>
                         </div>
@@ -1199,7 +1218,7 @@
             <div id="coordinates-tab" class="tab-content">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">🗺️ Search by Coordinates</h3>
+                        <h3 class="card-title"> Search by Coordinates</h3>
                         <p class="card-subtitle">Use precise latitude and longitude coordinates for exact location data</p>
                     </div>
                     <div class="card-body">
@@ -1217,11 +1236,11 @@
                         </div>
                         <div class="button-group">
                             <button class="btn btn-primary" onclick="getAQIByCoordinates()">
-                                <span class="btn-icon">🔍</span>
+                                <span class="btn-icon"></span>
                                 Get Air Quality
                             </button>
                             <button class="btn btn-outline" onclick="testSampleCoordinates()">
-                                <span class="btn-icon">🧪</span>
+                                <span class="btn-icon"></span>
                                 Test Sample Coordinates
                             </button>
                         </div>
@@ -1233,26 +1252,26 @@
             <div id="auto-tab" class="tab-content">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">🎯 Auto-Detect Location</h3>
+                        <h3 class="card-title"> Auto-Detect Location</h3>
                         <p class="card-subtitle">Automatically detect your location based on IP address for instant air quality data</p>
                     </div>
                     <div class="card-body">
                         <div class="auto-detect-info">
                             <div class="info-item">
-                                <span class="info-icon">🌐</span>
+                                <span class="info-icon"></span>
                                 <span class="info-text">Uses your IP address to determine location</span>
                             </div>
                             <div class="info-item">
-                                <span class="info-icon">⚡</span>
+                                <span class="info-icon"></span>
                                 <span class="info-text">Get instant results without typing</span>
                             </div>
                             <div class="info-item">
-                                <span class="info-icon">🔒</span>
+                                <span class="info-icon"></span>
                                 <span class="info-text">No location permissions required</span>
                             </div>
                         </div>
                         <button class="btn btn-primary btn-large" onclick="getAQIAuto()">
-                            <span class="btn-icon">🎯</span>
+                            <span class="btn-icon"></span>
                             Auto-Detect My Location
                         </button>
                     </div>
@@ -1262,7 +1281,7 @@
             <!-- ML Predictions Tab -->
             <div id="ml-tab" class="tab-content">
                 <div class="input-section">
-                    <h3>🧠 ML-Enhanced Predictions</h3>
+                    <h3> ML-Enhanced Predictions</h3>
                     <p>Get advanced air quality predictions using our trained Random Forest models that fuse TEMPO satellite data, ground measurements, and weather information.</p>
                     
                     <div class="input-group">
@@ -1270,10 +1289,10 @@
                         <input type="text" id="ml-location-input" placeholder="e.g., New York, NY or San Francisco, CA" value="New York, NY">
                     </div>
                     
-                    <button class="btn" onclick="getMLPredictionByLocation()">🧠 Get ML Prediction</button>
-                    <button class="btn btn-secondary" onclick="getMLModelInfo()">📊 Model Info</button>
-                    <button class="btn btn-secondary" onclick="getMLFeatureImportance()">🔬 Feature Analysis</button>
-                    <button class="btn btn-secondary" onclick="getMLAccuracyReport()">📈 Accuracy Report</button>
+                    <button class="btn" onclick="getMLPredictionByLocation()"> Get ML Prediction</button>
+                    <button class="btn btn-secondary" onclick="getMLModelInfo()"> Model Info</button>
+                    <button class="btn btn-secondary" onclick="getMLFeatureImportance()"> Feature Analysis</button>
+                    <button class="btn btn-secondary" onclick="getMLAccuracyReport()"> Accuracy Report</button>
                     
                     <hr class="ml-divider">
                     
@@ -1289,19 +1308,19 @@
                         </div>
                     </div>
                     
-                    <button class="btn" onclick="getMLPredictionByCoordinates()">🎯 Get Coordinate ML Prediction</button>
+                    <button class="btn" onclick="getMLPredictionByCoordinates()"> Get Coordinate ML Prediction</button>
                 </div>
             </div>
 
             <!-- NASA Space Apps Tab -->
             <div id="nasa-tab" class="tab-content">
                 <div class="input-section">
-                    <h3>🚀 NASA Space Apps Integration</h3>
+                    <h3> NASA Space Apps Integration</h3>
                     <p>Advanced air quality analysis using NASA Space Apps enhanced models with 17.3M EPA measurements, satellite data, and weather integration.</p>
                     
                     <div class="feature-grid">
                         <div class="feature-card">
-                            <h4>📊 Enhanced Data Sources</h4>
+                            <h4> Enhanced Data Sources</h4>
                             <p>Access to comprehensive EPA AQS dataset with 2,331 monitoring stations</p>
                             <button class="btn btn-feature" onclick="getDataSources()">View Data Sources</button>
                         </div>
@@ -1330,9 +1349,9 @@
                     <div class="input-group">
                         <label for="model-selector">Select Prediction Model:</label>
                         <select id="model-selector">
-                            <option value="ensemble">🎯 Ensemble (RF + TCN) - Best Accuracy</option>
-                            <option value="tcn">🧠 TCN - Advanced Temporal Modeling</option>
-                            <option value="random_forest">🌲 Random Forest - Fast & Reliable</option>
+                            <option value="ensemble"> Ensemble (RF + TCN) - Best Accuracy</option>
+                            <option value="tcn"> TCN - Advanced Temporal Modeling</option>
+                            <option value="random_forest"> Random Forest - Fast & Reliable</option>
                         </select>
                     </div>
                     
@@ -1341,7 +1360,7 @@
                 </div>
                 
                 <div class="nasa-stats">
-                    <h4>📈 NASA Space Apps Dataset Statistics</h4>
+                    <h4> NASA Space Apps Dataset Statistics</h4>
                     <div class="stats-grid">
                         <div class="stat-item">
                             <div class="stat-number">17.3M</div>
@@ -1366,11 +1385,11 @@
             <!-- Telegram Alerts Tab -->
             <div id="telegram-tab" class="tab-content">
                 <div class="input-section">
-                    <h3>� Telegram Air Quality Alerts</h3>
+                    <h3> Telegram Air Quality Alerts</h3>
                     <p>Get instant Telegram notifications with detailed air quality information, health recommendations, and color-coded AQI data sent directly to your chat!</p>
                     
                     <div class="telegram-form">
-                        <h4>🔔 Subscribe to Telegram Alerts</h4>
+                        <h4>Subscribe to Telegram Alerts</h4>
                         <div class="input-group">
                             <div style="margin-bottom: 10px;">
                                 <label>
@@ -1380,8 +1399,8 @@
                             </div>
                             <label for="telegram-chat-id">Telegram Chat ID:</label>
                             <input type="text" id="telegram-chat-id" placeholder="Your Telegram Chat ID (e.g., 123456789)" required>
-                            <small style="color: #666; font-size: 12px; margin-top: 5px; display: block;">
-                                💡 Don't know your Chat ID? <a href="/static/telegram_setup.html" target="_blank" style="color: #007bff;">Click here for setup guide</a>
+                            <small class="chat-id-help">
+                                 Don't know your Chat ID? <a href="/static/telegram_setup.html" target="_blank" class="chat-id-link">Click here for setup guide</a>
                             </small>
                         </div>
                         <div class="input-group">
@@ -1399,39 +1418,39 @@
                             </select>
                         </div>
                         <div class="button-group">
-                            <button onclick="subscribeTelegram()" class="btn primary">� Subscribe to Telegram Alerts</button>
-                            <button onclick="testTelegram()" class="btn secondary">🧪 Send Test Message</button>
+                            <button onclick="subscribeTelegram()" class="btn primary"> Subscribe to Telegram Alerts</button>
+                            <button onclick="testTelegram()" class="btn secondary"> Send Test Message</button>
                         </div>
                     </div>
 
                     <div class="telegram-form spaced">
-                        <h4>🔕 Unsubscribe</h4>
+                        <h4> Unsubscribe</h4>
                         <div class="input-group">
                             <label for="unsub-telegram">Telegram Chat ID:</label>
                             <input type="text" id="unsub-telegram" placeholder="Your Telegram Chat ID">
                         </div>
-                        <button onclick="unsubscribeTelegram()" class="btn danger">🔕 Unsubscribe</button>
+                        <button onclick="unsubscribeTelegram()" class="btn danger"> Unsubscribe</button>
                     </div>
 
                     <div class="telegram-info">
-                        <h4>ℹ️ How Telegram Alerts Work</h4>
+                        <h4> How Telegram Alerts Work</h4>
                         <ul>
-                            <li>� <strong>Rich HTML messages</strong> with beautiful formatting and color-coded AQI information</li>
-                            <li>🎯 <strong>Location-specific</strong> alerts for your chosen area</li>
-                            <li>🔬 <strong>Comprehensive details</strong> including AQI, all pollutants, health advice, and recommendations</li>
-                            <li>⚡ <strong>Free & instant</strong> powered by Telegram Bot API (no costs!)</li>
-                            <li>🛑 <strong>Easy management</strong> - unsubscribe anytime with one click</li>
-                            <li>📱 <strong>Mobile native</strong> - messages work perfectly on all devices</li>
+                            <li> <strong>Rich HTML messages</strong> with beautiful formatting and color-coded AQI information</li>
+                            <li> <strong>Location-specific</strong> alerts for your chosen area</li>
+                            <li> <strong>Comprehensive details</strong> including AQI, all pollutants, health advice, and recommendations</li>
+                            <li> <strong>Free & instant</strong> powered by Telegram Bot API (no costs!)</li>
+                            <li> <strong>Easy management</strong> - unsubscribe anytime with one click</li>
+                            <li> <strong>Mobile native</strong> - messages work perfectly on all devices</li>
                         </ul>
                         
                         <div class="alert-levels">
-                            <h5>🚨 Alert Levels</h5>
+                            <h5> Alert Levels</h5>
                             <div class="level-item good">🟢 Good (0-50): No alerts</div>
                             <div class="level-item moderate">🟡 Moderate (51-100): Optional alerts</div>
                             <div class="level-item sensitive">🟠 Unhealthy for Sensitive (101-150): Recommended</div>
                             <div class="level-item unhealthy">🔴 Unhealthy (151-200): Important</div>
                             <div class="level-item very-unhealthy">🟣 Very Unhealthy (201-300): Critical</div>
-                            <div class="level-item hazardous">🚨 Hazardous (301+): Emergency</div>
+                            <div class="level-item hazardous"> Hazardous (301+): Emergency</div>
                         </div>
                     </div>
 
@@ -1697,7 +1716,7 @@
             try {
                 const response = await fetch(`${API_BASE}/health`);
                 if (response.ok) {
-                    console.log('✅ API server is running');
+                    console.log('API server is running');
                 } else {
                     throw new Error('API server not responding');
                 }
@@ -1833,7 +1852,7 @@
                 
                 confidenceHTML = `
                     <div class="ml-confidence ${confClass}">
-                        <strong>🧠 ML Model Confidence: ${(avgConfidence || 0).toFixed(1)}%</strong><br>
+                        <strong> ML Model Confidence: ${(avgConfidence || 0).toFixed(1)}%</strong><br>
                         <small>Predictions based on ${data.model_info?.method || 'Random Forest'} trained on ${data.model_info?.data_sources || 'satellite and ground data'}</small>
                     </div>
                 `;
@@ -1846,9 +1865,9 @@
                                 <div class="aqi-category" style="color: #3498db">Prediction</div>
                             </div>
                             <div class="location-info">
-                                <strong>📍 ${data.location?.latitude?.toFixed(4) || 'Unknown'}, ${data.location?.longitude?.toFixed(4) || 'Unknown'}</strong><br>
-                                <small>🕒 ${new Date(data.timestamp).toLocaleString()}</small><br>
-                                <small>🧠 ML Enhanced Prediction</small>
+                                <strong> ${data.location?.latitude?.toFixed(4) || 'Unknown'}, ${data.location?.longitude?.toFixed(4) || 'Unknown'}</strong><br>
+                                <small> ${new Date(data.timestamp).toLocaleString()}</small><br>
+                                <small> ML Enhanced Prediction</small>
                             </div>
                         </div>
 
@@ -1859,7 +1878,7 @@
                         </div>
 
                         <div class="ml-info-card">
-                            <h4>🔬 About This Prediction</h4>
+                            <h4> About This Prediction</h4>
                             <p>This prediction uses machine learning models trained on TEMPO satellite data, ground station measurements, and meteorological information. The model learns complex relationships between satellite observations and actual surface concentrations.</p>
                             ${data.aqi_analysis?.error ? `<p><strong>Note:</strong> AQI calculation unavailable - ${data.aqi_analysis.error}</p>` : ''}
                         </div>
@@ -1882,7 +1901,7 @@
             if (data.overall_performance && Object.keys(data.overall_performance).length > 0) {
                 const perf = data.overall_performance;
                 performanceHTML = `
-                    <h4>📊 Quick Performance Overview</h4>
+                    <h4>Quick Performance Overview</h4>
                     <div class="pollutants-grid">
                         ${perf.average_r2 !== undefined ? `
                             <div class="pollutant-card">
@@ -1905,13 +1924,13 @@
                 <div class="aqi-card">
                     <div class="aqi-header">
                         <div>
-                            <div class="aqi-value" style="color: #27ae60">ℹ️</div>
+                            <div class="aqi-value" style="color: #27ae60">ℹ</div>
                             <div class="aqi-category" style="color: #27ae60">Model Info</div>
                         </div>
                     </div>
 
                     <div class="ml-info-card">
-                        <h4>🧠 ML Model Status</h4>
+                        <h4> ML Model Status</h4>
                         <p><strong>Status:</strong> ${data.model_status || 'Unknown'}</p>
                         <p><strong>Available Pollutants:</strong> ${(data.available_pollutants || []).join(', ') || 'None'}</p>
                         <p><strong>Model Type:</strong> Random Forest Regressor</p>
@@ -1919,7 +1938,7 @@
                         
                         ${performanceHTML}
                         
-                        <h4>� Metrics Explanation</h4>
+                        <h4> Metrics Explanation</h4>
                         <ul style="text-align: left; font-size: 0.9em;">
                             ${data.metrics_explanation ? Object.entries(data.metrics_explanation).map(([key, desc]) => 
                                 `<li><strong>${(key || 'Unknown').toUpperCase()}:</strong> ${desc}</li>`
@@ -1959,13 +1978,13 @@
                 <div class="aqi-card">
                     <div class="aqi-header">
                         <div>
-                            <div class="aqi-value" style="color: #9b59b6">🔬</div>
+                            <div class="aqi-value" style="color: #9b59b6"></div>
                             <div class="aqi-category" style="color: #9b59b6">Feature Analysis</div>
                         </div>
                     </div>
 
                     <div class="ml-info-card">
-                        <h4>🔬 Feature Importance Analysis</h4>
+                        <h4> Feature Importance Analysis</h4>
                         <p><strong>Model:</strong> ${data.model_info || 'Random Forest Ensemble'}</p>
                         <p><strong>Total Features:</strong> ${data.total_features || 'N/A'} | <strong>Status:</strong> ${data.models_status || 'Unknown'}</p>
                         
@@ -1992,7 +2011,7 @@
 
             let overallHTML = `
                 <div class="ml-info-card">
-                    <h4>📊 Overall Model Performance</h4>
+                    <h4> Overall Model Performance</h4>
                     <div class="pollutants-grid">
                         <div class="pollutant-card">
                             <div class="pollutant-name">Overall Accuracy</div>
@@ -2047,7 +2066,7 @@
                 <div class="aqi-card">
                     <div class="aqi-header">
                         <div>
-                            <div class="aqi-value" style="color: #e74c3c">📈</div>
+                            <div class="aqi-value" style="color: #e74c3c"></div>
                             <div class="aqi-category" style="color: #e74c3c">Accuracy Report</div>
                         </div>
                     </div>
@@ -2055,7 +2074,7 @@
                     ${overallHTML}
 
                     <div class="ml-info-card">
-                        <h4>📊 Individual Pollutant Performance</h4>
+                        <h4> Individual Pollutant Performance</h4>
                         <div class="pollutants-grid">
                             ${pollutantDetailsHTML}
                         </div>
@@ -2148,7 +2167,7 @@
             if (data.nasa_space_apps && data.nasa_space_apps.enabled) {
                 nasaAppsInfo = `
                     <div class="enhanced-data-display">
-                        <h4>🚀 NASA Space Apps Components</h4>
+                        <h4> NASA Space Apps Components</h4>
                         <p><strong>Dataset Size:</strong> ${data.nasa_space_apps.components.dataset_size}</p>
                         <p><strong>Monitoring Stations:</strong> ${data.nasa_space_apps.components.monitoring_stations}</p>
                         <p><strong>Pollutants:</strong> ${data.nasa_space_apps.components.pollutants.join(', ')}</p>
@@ -2159,7 +2178,7 @@
             } else {
                 nasaAppsInfo = `
                     <div class="enhanced-data-display">
-                        <h4>⚠️ NASA Space Apps Integration</h4>
+                        <h4>Model Integration</h4>
                         <p>Advanced components not available. Using standard data sources only.</p>
                     </div>
                 `;
@@ -2169,15 +2188,15 @@
                 <div class="aqi-card">
                     <div class="aqi-header">
                         <div>
-                            <div class="aqi-value" style="color: #e74c3c">📊</div>
+                            <div class="aqi-value" style="color: #e74c3c"></div>
                             <div class="aqi-category" style="color: #e74c3c">Data Sources</div>
                         </div>
                     </div>
 
                     <div class="ml-info-card">
-                        <h4>🌍 Current System Data Sources</h4>
+                        <h4> Current System Data Sources</h4>
                         ${data.sources ? data.sources.map(source => `
-                            <p><strong>${source.name}:</strong> ${source.status === 'active' ? '✅ Active' : '❌ Inactive'} - ${source.description}</p>
+                            <p><strong>${source.name}:</strong> ${source.status === 'active' ? ' Active' : ' Inactive'} - ${source.description}</p>
                         `).join('') : '<p>No data sources available</p>'}
                         <p><strong>Integration Status:</strong> ${data.integration_status || 'Standard System'}</p>
                     </div>
@@ -2200,7 +2219,7 @@
                     const features = model.features ? model.features.join(', ') : 'No features listed';
                     modelsHTML += `
                         <div class="ml-info-card">
-                            <h4>🤖 ${model.type}</h4>
+                            <h4> ${model.type}</h4>
                             <p><strong>Available Pollutants:</strong> ${model.available_pollutants ? model.available_pollutants.join(', ') : 'None'}</p>
                             <p><strong>Features:</strong> ${features}</p>
                         </div>
@@ -2214,7 +2233,7 @@
                 <div class="aqi-card">
                     <div class="aqi-header">
                         <div>
-                            <div class="aqi-value" style="color: #9b59b6">🤖</div>
+                            <div class="aqi-value" style="color: #9b59b6"></div>
                             <div class="aqi-category" style="color: #9b59b6">Models</div>
                         </div>
                     </div>
@@ -2268,7 +2287,7 @@
                             <div class="aqi-category" style="color: #1abc9c">Enhanced Data</div>
                         </div>
                         <div class="location-info">
-                            📍 ${data.location.name || `${data.location.latitude}, ${data.location.longitude}`}
+                             ${data.location.name || `${data.location.latitude}, ${data.location.longitude}`}
                         </div>
                     </div>
 
@@ -2291,7 +2310,7 @@
             if (aqiCard && modelType) {
                 const modelBadge = `
                     <div class="ml-confidence high" style="margin-top: 15px;">
-                        <strong>🚀 Advanced Model Used:</strong> ${(modelType || 'TCN').toUpperCase().replace('_', ' ')}
+                        <strong> Advanced Model Used:</strong> ${(modelType || 'TCN').toUpperCase().replace('_', ' ')}
                         ${data.metadata && data.metadata.advanced_features ? ' (NASA Space Apps Enhanced)' : ''}
                     </div>
                 `;
@@ -2319,7 +2338,7 @@
         function showSMSSetupInstructions() {
             const setupHTML = `
                 <div class="sms-info">
-                    <h4>⚠️ SMS Service Setup Required</h4>
+                    <h4> SMS Service Setup Required</h4>
                     <p>Your Twilio account is active but needs additional configuration:</p>
                     <ul>
                         <li><strong>Get a Phone Number:</strong> Visit <a href="https://console.twilio.com/" target="_blank">Twilio Console</a> → Phone Numbers → Buy a number</li>
@@ -2327,8 +2346,8 @@
                         <li><strong>Restart Server:</strong> After setup, restart the NASA server</li>
                     </ul>
                     <div style="margin-top: 15px;">
-                        <a href="/static/sms_setup.html" target="_blank" class="btn secondary">📖 View Detailed Setup Guide</a>
-                        <button onclick="getSMSStatus()" class="btn primary">🔄 Refresh Status</button>
+                        <a href="/static/sms_setup.html" target="_blank" class="btn secondary"> View Detailed Setup Guide</a>
+                        <button onclick="getSMSStatus()" class="btn primary"> Refresh Status</button>
                     </div>
                 </div>
             `;
@@ -2438,7 +2457,7 @@
                 if (data.service_active && data.twilio_number) {
                     statusHtml = `
                         <div class="sms-info">
-                            <h4>✅ SMS Service Status - Ready</h4>
+                            <h4> SMS Service Status - Ready</h4>
                             <p><strong>Service:</strong> Active</p>
                             <p><strong>Twilio Number:</strong> ${data.twilio_number}</p>
                             <p><strong>Total Subscribers:</strong> ${data.total_subscribers || 0}</p>

@@ -98,11 +98,11 @@ class TelegramAlertService:
         try:
             # Validate chat ID by sending a test message
             welcome_msg = f"""
-🌍 <b>AQI Alert Subscription Confirmed!</b>
+<b>AQI Alert Subscription Confirmed!</b>
 
-📍 <b>Location:</b> {location}
-🚨 <b>Alert Threshold:</b> {threshold} AQI
-📱 <b>Chat ID:</b> {chat_id}
+<b>Location:</b> {location}
+<b>Alert Threshold:</b> {threshold} AQI
+<b>Chat ID:</b> {chat_id}
 
 You'll receive air quality alerts when AQI exceeds {threshold}.
 
@@ -232,10 +232,10 @@ To subscribe again, visit: <code>/telegram/subscribe</code>
             message = f"""
 {emoji} <b>AQI Alert - {category}</b>
 
-📍 <b>Location:</b> {location}
-📊 <b>AQI Value:</b> {aqi_value}
-🏷️ <b>Category:</b> {category}
-🎯 <b>Dominant Pollutant:</b> {dominant_pollutant.upper()}
+<b>Location:</b> {location}
+<b>AQI Value:</b> {aqi_value}
+<b>Category:</b> {category}
+<b>Dominant Pollutant:</b> {dominant_pollutant.upper()}
 
 💊 <b>Health Advisory:</b>
 {health_message}
