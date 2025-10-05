@@ -628,94 +628,187 @@ class NASASpaceAppsHandler(BaseHTTPRequestHandler):
         }
     
     def get_user_location_by_ip(self):
-        """Get user's location using IP geolocation services"""
+        """Get user's location using IP geolocation services with production-ready improvements"""
         try:
             import urllib.request
+            import urllib.error
             
             # Get client IP address
             client_ip = self.get_client_ip()
-            print(f"🌐 Client IP: {client_ip}")  # Debug logging
+            print(f"🌐 Detected client IP: {client_ip}")
             
-            # Try multiple geolocation services for better accuracy
+            # Skip localhost/private IPs
+            if client_ip in ['127.0.0.1', '::1'] or client_ip.startswith(('10.', '192.168.', '172.')):
+                print("⚠️ Local/private IP detected, cannot geolocate")
+                return "New York, NY, United States"
+            
+            # Production-ready geolocation services with better error handling
             location_services = [
-                "http://ip-api.com/json/",  # Auto-detect IP (most reliable)
-                f"http://ip-api.com/json/{client_ip}",  # Specific IP
-                "https://ipapi.co/json/",
+                {
+                    'url': f"http://ip-api.com/json/{client_ip}?fields=status,message,country,regionName,city,query",
+                    'name': 'IP-API (specific IP)',
+                    'parser': self._parse_ipapi_response
+                },
+                {
+                    'url': "http://ip-api.com/json/?fields=status,message,country,regionName,city,query",
+                    'name': 'IP-API (auto-detect)',
+                    'parser': self._parse_ipapi_response
+                },
+                {
+                    'url': f"https://ipapi.co/{client_ip}/json/",
+                    'name': 'IPAPI.CO (specific IP)',
+                    'parser': self._parse_ipapico_response
+                },
+                {
+                    'url': "https://ipapi.co/json/",
+                    'name': 'IPAPI.CO (auto-detect)',
+                    'parser': self._parse_ipapico_response
+                },
+                {
+                    'url': f"http://ipinfo.io/{client_ip}/json",
+                    'name': 'IPInfo (specific IP)',
+                    'parser': self._parse_ipinfo_response
+                }
             ]
             
-            for service_url in location_services:
+            for service in location_services:
                 try:
-                    print(f"🔍 Trying geolocation service: {service_url}")
-                    with urllib.request.urlopen(service_url, timeout=10) as response:
-                        data = json.loads(response.read().decode())
-                        print(f"📍 Geolocation response: {data}")
-                        
-                        # Handle different API response formats
-                        if 'city' in data and 'country' in data:
-                            # ip-api.com format
-                            if data.get('status') == 'success' or 'status' not in data:
-                                city = data.get('city', 'Unknown')
-                                region = data.get('regionName', data.get('region', ''))
-                                country = data.get('country', '')
-                                
-                                # Format location string
-                                if region and region != city:
-                                    detected_location = f"{city}, {region}, {country}"
-                                else:
-                                    detected_location = f"{city}, {country}"
-                                
-                                print(f"✅ Successfully detected location: {detected_location}")
-                                return detected_location
-                        
-                        # ipapi.co format
-                        elif 'city' in data and 'country_name' in data:
-                            city = data.get('city', 'Unknown')
-                            region = data.get('region', '')
-                            country = data.get('country_name', '')
+                    print(f"🔍 Trying {service['name']}: {service['url']}")
+                    
+                    # Create request with proper headers
+                    request = urllib.request.Request(
+                        service['url'],
+                        headers={
+                            'User-Agent': 'NASA-AQI-Monitor/1.0',
+                            'Accept': 'application/json',
+                            'Accept-Language': 'en-US,en;q=0.9'
+                        }
+                    )
+                    
+                    with urllib.request.urlopen(request, timeout=8) as response:
+                        if response.getcode() == 200:
+                            data = json.loads(response.read().decode())
+                            print(f"📍 Response from {service['name']}: {data}")
                             
-                            if region and region != city:
-                                detected_location = f"{city}, {region}, {country}"
-                            else:
-                                detected_location = f"{city}, {country}"
+                            location = service['parser'](data)
+                            if location and location != "Unknown Location":
+                                print(f"✅ Successfully detected location via {service['name']}: {location}")
+                                return location
+                        else:
+                            print(f"❌ HTTP {response.getcode()} from {service['name']}")
                             
-                            print(f"✅ Successfully detected location: {detected_location}")
-                            return detected_location
-                                
+                except urllib.error.HTTPError as e:
+                    print(f"❌ HTTP Error from {service['name']}: {e.code} - {e.reason}")
+                except urllib.error.URLError as e:
+                    print(f"❌ URL Error from {service['name']}: {e.reason}")
+                except json.JSONDecodeError as e:
+                    print(f"❌ JSON Error from {service['name']}: {e}")
                 except Exception as e:
-                    print(f"❌ Geolocation service failed: {service_url} - {e}")
+                    print(f"❌ Unexpected error from {service['name']}: {e}")
                     continue
             
             # If all services fail, return a reasonable default
             print("⚠️ All geolocation services failed, using fallback location")
-            return "New York, NY, United States"  # Generic fallback
+            return "New York, NY, United States"
             
         except Exception as e:
-            print(f"❌ Error in IP geolocation: {e}")
-            return "New York, NY, United States"  # Generic fallback
+            print(f"❌ Critical error in IP geolocation: {e}")
+            return "New York, NY, United States"
+    
+    def _parse_ipapi_response(self, data):
+        """Parse ip-api.com response"""
+        try:
+            if data.get('status') == 'success':
+                city = data.get('city', '').strip()
+                region = data.get('regionName', '').strip()
+                country = data.get('country', '').strip()
+                
+                if city and country:
+                    if region and region != city:
+                        return f"{city}, {region}, {country}"
+                    else:
+                        return f"{city}, {country}"
+            else:
+                print(f"❌ IP-API error: {data.get('message', 'Unknown error')}")
+        except Exception as e:
+            print(f"❌ Error parsing IP-API response: {e}")
+        return None
+    
+    def _parse_ipapico_response(self, data):
+        """Parse ipapi.co response"""
+        try:
+            city = data.get('city', '').strip()
+            region = data.get('region', '').strip()
+            country = data.get('country_name', '').strip()
+            
+            if city and country:
+                if region and region != city:
+                    return f"{city}, {region}, {country}"
+                else:
+                    return f"{city}, {country}"
+        except Exception as e:
+            print(f"❌ Error parsing IPAPI.CO response: {e}")
+        return None
+    
+    def _parse_ipinfo_response(self, data):
+        """Parse ipinfo.io response"""
+        try:
+            city = data.get('city', '').strip()
+            region = data.get('region', '').strip()
+            country = data.get('country', '').strip()
+            
+            if city and country:
+                if region and region != city:
+                    return f"{city}, {region}, {country}"
+                else:
+                    return f"{city}, {country}"
+        except Exception as e:
+            print(f"❌ Error parsing IPInfo response: {e}")
+        return None
     
     def get_client_ip(self):
         """Get the client's IP address from request headers"""
         try:
+            # Check for Render-specific headers first
+            render_ip = self.headers.get('X-Render-Client-IP')
+            if render_ip and render_ip != '127.0.0.1':
+                print(f"🔄 Found Render client IP: {render_ip}")
+                return render_ip.strip()
+            
             # Check for forwarded IP addresses (behind proxy/load balancer)
             forwarded_for = self.headers.get('X-Forwarded-For')
             if forwarded_for:
-                # Take the first IP in the chain
-                return forwarded_for.split(',')[0].strip()
+                # Take the first IP in the chain (the original client IP)
+                ip_list = forwarded_for.split(',')
+                client_ip = ip_list[0].strip()
+                print(f"🔄 Found X-Forwarded-For IP: {client_ip} (from {forwarded_for})")
+                # Avoid private/local IPs
+                if not client_ip.startswith(('127.', '10.', '192.168.', '172.')):
+                    return client_ip
             
             # Check for real IP header
             real_ip = self.headers.get('X-Real-IP')
-            if real_ip:
+            if real_ip and not real_ip.startswith(('127.', '10.', '192.168.', '172.')):
+                print(f"🔄 Found X-Real-IP: {real_ip}")
                 return real_ip.strip()
             
+            # Check CF-Connecting-IP (Cloudflare)
+            cf_ip = self.headers.get('CF-Connecting-IP')
+            if cf_ip and not cf_ip.startswith(('127.', '10.', '192.168.', '172.')):
+                print(f"🔄 Found CF-Connecting-IP: {cf_ip}")
+                return cf_ip.strip()
+            
             # Fall back to remote address
-            return self.client_address[0]
+            remote_ip = self.client_address[0]
+            print(f"🔄 Using remote address: {remote_ip}")
+            return remote_ip
         except Exception as e:
-            print(f"Error getting client IP: {e}")
+            print(f"❌ Error getting client IP: {e}")
             return "127.0.0.1"  # localhost fallback
     
-    def create_auto_detect_response(self, location):
+    def create_auto_detect_response(self, location, is_fallback=False):
         """Create a comprehensive auto-detect response with detected location"""
-        print(f"🏗️ Creating auto-detect response for location: {location}")
+        print(f"🏗️ Creating auto-detect response for location: {location} (fallback: {is_fallback})")
         try:
             # Set coordinates based on detected location
             lat, lon = 12.9716, 77.5946  # Default to Bengaluru
@@ -825,48 +918,74 @@ class NASASpaceAppsHandler(BaseHTTPRequestHandler):
             }
     
     def handle_aqi_auto(self):
-        """Auto-detect AQI using IP geolocation"""
-        print("DEBUG: HANDLE_AQI_AUTO CALLED")  # Debug to see if function is called
+        """Auto-detect AQI using IP geolocation with production-ready error handling"""
+        print("🚀 Starting auto-detection process...")
+        
+        # Add CORS headers for production
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        
         try:
             # Get user's actual location using IP geolocation
             auto_location = self.get_user_location_by_ip()
-            print(f"DEBUG: Auto-detected location: {auto_location}")  # Debug logging
+            print(f"🎯 Auto-detected location: {auto_location}")
+            
+            # Check if we got a meaningful location (not just fallback)
+            is_fallback = auto_location in ["New York, NY, United States", "Unknown Location"]
             
             # Try to use AQI agent with the detected location first
-            if hasattr(self, 'aqi_agent') and self.aqi_agent and auto_location != "Bengaluru, Karnataka, India":
-                # Only use AQI agent if we got a different location (not our fallback)
+            if hasattr(self, 'aqi_agent') and self.aqi_agent and not is_fallback:
                 try:
+                    print(f"🔍 Attempting AQI lookup for: {auto_location}")
                     result = self.aqi_agent.get_comprehensive_aqi(auto_location)
                     if result and result.get('success'):
                         response = result
                         response["request_type"] = "auto"
-                        response["location"]["address"] = f"📍 Auto-detected location: {auto_location}"
+                        response["auto_detected"] = True
+                        response["location"]["address"] = f"📍 Auto-detected: {auto_location}"
+                        response["detection_method"] = "IP geolocation"
+                        print(f"✅ Successfully got AQI data for auto-detected location")
                         self.send_json_response(response)
                         return
+                    else:
+                        print(f"⚠️ AQI agent returned no data for {auto_location}")
                 except Exception as e:
-                    print(f"AQI agent failed for {auto_location}: {e}")
+                    print(f"❌ AQI agent failed for {auto_location}: {e}")
             
             # Create our own response with the detected location
-            response = self.create_auto_detect_response(auto_location)
+            print(f"🏗️ Creating custom response for: {auto_location}")
+            response = self.create_auto_detect_response(auto_location, is_fallback)
             self.send_json_response(response)
             return
             
         except Exception as e:
-            print(f"Error in auto-detect: {e}")
-            # Emergency fallback
+            print(f"❌ Critical error in auto-detect: {e}")
+            import traceback
+            traceback.print_exc()
+            
+            # Emergency fallback with user-friendly message
             response = {
                 "request_type": "auto",
+                "auto_detected": False,
+                "error_occurred": True,
                 "location": {
-                    "address": "📍 Auto-detected location: Default"
+                    "address": "📍 Location detection failed - using default",
+                    "city": "New York",
+                    "region": "NY",
+                    "country": "United States"
                 },
-                "overall_aqi": 50,
+                "overall_aqi": 45,
                 "overall_category": "Good",
-                "dominant_pollutant": "None",
-                "health_message": "Air quality is good.",
-                "data_sources": ["Fallback system"],
+                "dominant_pollutant": "PM2.5",
+                "health_message": "Location detection failed, but air quality data is available. Please use manual location input for more accurate results.",
+                "data_sources": ["Emergency fallback system"],
+                "detection_method": "Fallback",
                 "timestamp": datetime.datetime.now().isoformat(),
-                "success": True
+                "success": True,
+                "fallback_used": True
             }
+            print("🆘 Sending emergency fallback response")
             self.send_json_response(response)
     
     def handle_ml_predict_location(self, location):
